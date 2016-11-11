@@ -1,0 +1,102 @@
+
+nav ul {margin:0; padding:0;}
+nav ul li {display:inline; margin:5px;}
+
+.tab {
+    border: 1px solid black;
+	background-color: Cyan;
+	padding: 5px;
+}
+
+.tab:hover {
+   background-color: DarkCyan;
+   font-weight: bold;
+}
+
+.noDate {
+	background-color: grey;
+	width: 80px;
+	height: 80px;
+}
+
+.withDate {
+	background-color: white;
+	border: 1px;
+	border-style: solid;
+	padding-left: 5px;
+	width: 80px;
+	height: 80px;
+}
+ 
+.selectedDate {
+    background-color: blue;
+    font-weight: bold;
+	color : white;
+}
+ 
+.dayHeader {
+	background-color: white;
+	font-weight: bold;
+	width: 80px;
+    height: 25px;
+} 
+
+.weekTotal {
+    padding: 0px 0px 0px 10px;
+    text-align: right;
+}
+
+
+#tblCalendar {
+	margin_top: 35px;
+}
+
+#tblExistingEntries {
+    border-collapse: collapse;
+	float: left;
+	width: 50%;
+	margin-left: 50px;
+	margin-top: 15px;
+	background-color: Azure;
+	border-left: 1 px solid black;
+	border-right: 1 px solid black;
+}
+
+#tblExistingEntries td {
+    border-bottom: 1px solid black;
+	padding: 15px;
+}
+
+#tblExistingEntries tr:hover {
+    background-color: Beige;
+}
+
+#tblViewAsList {
+    border-collapse: collapse;
+	width: 100%;
+	margin: 50px;	
+	background-color: Azure;
+	border-left: 1 px solid black;
+	border-right: 1 px solid black;
+}
+
+#tblViewAsList td {
+    border-bottom: 1px solid black;
+	padding: 15px;
+}
+
+#tblViewAsList tr:hover {
+    background-color: Beige;
+}
+
+
+#pnlDateEntry {
+	margin-top: 35px;
+	clear: both;
+}
+
+
+.headerframe {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

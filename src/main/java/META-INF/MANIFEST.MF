@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Class-Path: poi-ooxml-3.14.jar jetty-security-9.0.2.v20130417.jar slf4
+ j-api-1.7.2.jar jetty-servlet-9.0.2.v20130417.jar curvesapi-1.03.jar 
+ commons-lang3-3.1.jar jetty-util-9.0.2.v20130417.jar jetty-server-9.0
+ .2.v20130417.jar jackson-annotations-2.6.0.jar jetty-http-9.0.2.v2013
+ 0417.jar poi-ooxml-schemas-3.14.jar spark-core-1.1.1.jar xmlbeans-2.6
+ .0.jar mongodb-driver-3.2.2.jar commons-codec-1.7.jar freemarker-2.3.
+ 25-incubating.jar stax-api-1.0.1.jar poi-3.14.jar jackson-databind-2.
+ 6.3.jar jetty-xml-9.0.2.v20130417.jar bson-3.2.2.jar jetty-webapp-9.0
+ .2.v20130417.jar javax.servlet-3.0.0.v201112011016.jar mongodb-driver
+ -core-3.2.2.jar jackson-core-2.6.3.jar jetty-io-9.0.2.v20130417.jar
+Main-Class: controllers.MainController
+

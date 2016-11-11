@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+  <script src="jquery-2.2.1.js"></script>  
+  <script src="jqueryScripts.js"></script>
+  <script src="classDefs.js"></script>
+
+
+  <title>Jeff's Sample Page</title>
+<script>
+
+  function myMove() {
+	  var elem = document.getElementById("animate");   
+	  var pos = 0;
+	  var id = setInterval(frame, 5);
+	  function frame() {
+		if (pos == 350) {
+		  clearInterval(id);
+		} else {
+		  pos++; 
+		  elem.style.top = pos + 'px'; 
+		  elem.style.left = pos + 'px'; 
+		}
+	  }
+	}
+	
+   
+</script>
+
+	<style>
+		.important {
+		   font-size: 25px;
+		   color: red
+		  }
+		  
+		
+		 #container {
+		  width: 400px;
+		  height: 400px;
+		  position: relative;
+		  background: yellow;
+		}
+		#animate {
+		  width: 50px;
+		  height: 50px;
+		  position: absolute;
+		  background-color: red;
+		}
+
+	</style>
+
+	
+</head>
+<body>
+
+
+<h1>My First JavaScript</h1>
+
+<p id="top"></p>
+<button id="btnSetDate" type="button">
+Click me to display Date and Time.</button>
+
+<p id="demo"></p>
+
+<hr>
+
+<img id="lightBulb" src="http://www.w3schools.com/js/pic_bulboff.gif" width="100" height="180">
+
+<p>Click the light bulb to turn on/off the light.</p>
+
+<hr>
+
+<input id="numb">
+
+<button type="button" id="btnValNumber">Validate Number</button>
+
+<p id="numberMsg"></p>
+
+<hr>
+
+
+<select id="selSortChar">
+  <option value=0>1st Character</option>
+  <option value=1>2nd Character</option>
+  <option value=2>3rd Character</option>
+ </select>
+
+<br>
+<br>
+<hr>
+<br>
+<br>
+
+<p>
+<button onclick="myMove()">Click Me</button>
+</p> 
+
+<p>
+<button id="btnAnimate">Animate by Jquery</button>
+</p> 
+
+<div id ="container">
+<div id ="animate"></div>
+</div>
+
+<br>
+<br>
+<hr>
+<h2>Input Types</h2>
+<form>
+	<fieldset>
+		<legend>Three Fields Go Into a Bar</legend>
+			attrib: readonly : <input id="txtFreeForm1" type="text" readonly></input><br>
+			attrib: disabled : <input id="txtFreeForm11" type="text" disabled></input><br>
+			field 2: <input id="txtFreeForm2" type="text"></input><br>
+			password field: <input id="txtFreeForm3" type="password"></input><br>
+			checkbox <input type="checkbox" name="vehicle1" value="bike">I ride a bike<br/>
+			this is a 'range' input type: <input type="range"  id="a" name="a" value="50">	  <br/>
+	       this is a 'number' input type: <input type="number" id="b" name="b" value="50" min="1" max="200" step="10"><br/>
+		   this is a required field: <input type="text" required="true" size="50"></input><br/>
+		   this is a 'date' field (calendar): <input type="date" name="bday" min="2000-01-01" max="2016-12-31"><br/>
+		   this is a 'month' input type (month/year): <input type="month" name="bdaymonth"><br/>
+		   this is a 'week' input type (week/year): <input type="week" name="week_year"><br/>
+		   this is a 'time' input type: <input type="time" name="usr_time"><br/>
+		   this is a 'datetime-local' input type: <input type="datetime-local" name="bdaytime"><br/>
+		   this is an 'email' input type: <input type="email" name="email"><br/>
+		   this is a 'tel' input type (telephone): <input type="tel" name="usrtel"><br/>
+		   this is a 'url' input type: <input type="url" name="homepage"><br/>
+		   this is a 'color' input type: <input type="color" name="favcolor"><br/>
+
+		To see more attributes: <button onclick="window.open().location.assign('http://www.w3schools.com/html/html_form_attributes.asp')">Open W3Schools for HTML5 attributes</button><br/>
+	
+		What's your gender?<br/>
+		<input type="radio" name="gender" value="male" checked onclick="document.getElementById('selectedGender').innerHTML = 'male'"> Male<br>
+		<input type="radio" name="gender" value="female" onclick='$("#selectedGender").text("female")'> Female<br>
+		<input type="radio" name="gender" value="other" onclick='$("#selectedGender").text("huh")'> Other
+		<br/>
+		<p id="selectedGender"></p><br/>
+		<textarea name="inputTextArea" rows="10" cols = "50"></textArea><br/>
+		 This is an input that behaves a bit like a dropdown:<input list="browsers" name="browser">
+		  <datalist id="browsers">
+			<option value="Internet Explorer">
+			<option value="Firefox">
+			<option value="Chrome">
+			<option value="Opera">
+			<option value="Safari">
+		  </datalist>
+		  <br/>
+		  
+		This is a select with a 'optGroup' feature:
+		<select>
+		  <optgroup label="Swedish Cars">
+			<option value="volvo">Volvo</option>
+			<option value="saab">Saab</option>
+		  </optgroup>
+		  <optgroup label="German Cars">
+			<option value="mercedes">Mercedes</option>
+			<option value="audi">Audi</option>
+		  </optgroup>
+		</select>
+	<br/>
+</fieldset>
+		<input type="submit">   <br/>	
+</form>
+
+<hr>
+<h2>Some Window/Browser Functions</h2>
+
+size of the window using JavaScript: <div id="displayWindowSize"></div><br>
+size of the screen using JavaScript: <div id="displayScreenSize"></div><br>
+size of the window using JQuery: <div id="displaySizeUsingJquery"></div><br>
+window info : <div id="windowLocation"></div><br>
+window.navigator info:<br/> <div id="navInfo"></div><br>
+
+<button onclick="window.open().location.assign('http://www.yahoo.com')">click me to open another window</button>
+<script>
+	
+  var sizeText = "Height: " + window.innerHeight + ", Width: " + window.innerWidth;
+  document.getElementById("displayWindowSize").innerHTML = sizeText;
+
+  document.getElementById("displayScreenSize").innerHTML = "Height: " + screen.height + "Width: " + screen.width;
+  
+  var sizeText2 = "Height: " + $(window).height() + ", Width: " + $(window).width();
+  $("#displaySizeUsingJquery").text(sizeText2);
+  
+  document.getElementById("windowLocation").innerHTML = "window.location.href: " + window.location.href + "<br>" +
+                                                        "window.location.hostname: " + window.location.hostname + "<br>" +
+														"window.location.pathname: " + window.location.pathname  + "<br>" +
+														"window.location.protocol: " + window.location.protocol + "<br>";
+
+  document.getElementById("navInfo").innerHTML = "navigator.appName: " + navigator.appName + "<br>" +									
+                                                 "navigator.appCodeName: " + navigator.appCodeName + "<br>" +
+												 "navigator.platform: " + navigator.platform + "<br>" +
+												 "navigator.cookieEnabled: " + navigator.cookieEnabled + "<br>" +
+												 "navigator.product: " + navigator.product + "<br>" +
+												 "navigator.appVersion: " + navigator.appVersion + "<br>" +
+												 "navigator.language: " + navigator.language + "<br>" +
+												 "navigator.javaEnabled: " + navigator.javaEnabled() + "<br>" +
+												 "navigator.geolocation: " + navigator.geolocation;
+	
+                                                        
+  </script>
+
+  <hr/>
+  <h2>Some storage/cache options</h2>
+  <p id="storageEnabled"></p>
+  <p id="viewCount"></p>
+  
+  <script>
+	if (typeof(Storage) !== "undefined") {
+		$("#storageEnabled").text("local storage is enabled.");
+		if (localStorage.clickcount) {
+			localStorage.clickcount = Number(localStorage.clickcount) + 1;
+		} else {
+			localStorage.clickcount = 1;
+		}
+		document.getElementById("viewCount").innerHTML = "You have viewed this page " +
+		localStorage.clickcount + " time(s) since adding this tag";
+		  
+	} else {
+		$("#storageEnabled").text("local storage is NOT enabled");
+	}
+</script>
+
+  <hr>
+  <h2>Some prompt popup types</h2>
+  <select id="selPopupType"> 
+    <option value="-1">Select a popup type</option>
+	<option value="1">alert</option>
+	<option value="2">confirm</option>
+	<option value="3">prompt</option>
+  </select>
+  <script>
+	 $("#selPopupType").change(function() {
+		if ($("#selPopupType").val() == "1") {
+			window.alert("Hey this is an alert!");
+		} else if ($("#selPopupType").val() == "2") {
+			var resp  = window.confirm ("This is a confirm button. Do you confirm?");
+			if (resp == true) {
+			   window.alert("You confirmed my good man!");
+			} else {
+			   window.alert("thanks for NOT confirming");
+			}
+		} else if ($("#selPopupType").val() == "3") {
+		   var resp = window.prompt("What is your favorite color?", "enter color");
+		   if (resp == null) {
+		      window.alert("really? no color?");
+			} else {
+			   window.alert("very nice...I like " + resp + " too.");
+			}
+	     }
+     });
+  </script>
+  
+  <hr>
+  <h3>Some timing functions<h3>
+  <button onclick="setTimeout(delayedReaction,3000)">delayed reaction</button>
+  <button onclick="startIt()">continuous reaction</button>  
+  <button id="btnStopIt" onclick="stopIt()">Stop it already, I get the idea</button>
+  
+  <p id="pnlContText">Is it clicking?</p>
+  
+  
+  <script>
+  
+    var timerId;
+	
+	function delayedReaction() {
+	   window.alert ("BAM!!! DID I SCARE YOU");
+	}
+		
+	function continuousReaction() {
+		$("#pnlContText").text($("#pnlContText").text() + ".");
+	}
+	
+	function startIt() {
+		timerId = setInterval(continuousReaction,1000);
+		$("#btnStopIt").show();
+	}
+	
+	function stopIt() {
+		clearInterval(timerId);
+	}
+	
+  </script>
+  
+ <hr>
+ <h2>Some Formatting Features</h2>
+ <pre>
+   this text will appear
+   on several lines without the
+   need to insert the 'br' tag. it
+   is done by wrapping the text with 'pre' tag.
+   It also is shown in the font displayed.
+</pre>
+
+<hr>
+<h2>Styles</h2>
+<h3>Inline Styles - defined on the tag</h3>
+<p style="background-color:lightgrey;">This division is styled with background-color:lightgrey</p>
+<p style="color:blue;">this division has the font turned to blue with color:blue</p>
+<p style="font-family:verdana;">this division has the font set with font-family:verdana</p>
+<p style="font-size:300%;">this font has been set to the size shown with font-size:300%</p>
+<p style="font-size:150%;">this font has been set to the size shown with font-size:150%</p>
+<p style="text-align:center;">to center text, use text-align:center</p>
+<h2>Formatting with style tags</h2>
+
+<p><small>This font is small by wrapping with 'small'</small>, while this is normal</p>
+<p><b>this is bold text ('b' tag)</b> while this is <strong>'strong' text</strong>. This is <i>italized with 'i'</i> and this is <em>emphasized with 'em'</em></p>
+<p>This is <mark>Marked with the 'mark' tag</tag></p>
+<p>This is <del>deleted with the 'del' tag</del></p>
+<p>This is <ins>inserted text with 'ins'</ins></p>
+<p> this is <sub>subscripted with 'sub'</sub></p>
+<p>this is <sup>superscripted with 'sup'</sup></p>
+<p>if you want <q>quote text</q> wrap it with the 'q' tag</p>
+<p>If you have a large quote to to display as indented</p>
+<blockquote>then wrap your text with 'blockquote' and then it gets indented as well</blockquote>
+<p>The American National Standards Institute is bettern known as <abbr title="American National Standards Institute">ANSI</abbr>. If you hover over the word 'ANSI', you'll see the full definition - this was done by wrapping the word with 'abbr' and setting the 'title' attribute</p>
+<p>If you want an itilized address block, wrap in the 'address' tag
+<address>
+Written by John Doe.<br> 
+Visit us at:<br>
+Example.com<br>
+Box 564, Disneyland<br>
+USA
+</address>
+</p>
+<p><to 'cite' something, like <cite>this</cite> wrap it in 'cite'</p>
+<p>here is a weird formatting tag.<br>This is the line written normally. If I wrap it with the 'bdo dir="rtl" tag (bi-directional - right to left', i get this</br>
+<bdo dir="rtl">This is the line written normally</bdo></p>
+<hr>
+<p>The 'kbd' tag represents keyboard input:</p>
+<p><kbd>File | Open...</kbd></p>
+<p>to simulate coding, use the 'code' tag, wrapped in the 'pre' tag to perserve whitespace/linebreaks:</p>
+<pre>
+<code>
+var x = 5;
+var y = 6;
+document.getElementById("demo").innerHTML = x + y;
+</code>
+</pre>
+
+<p>and to simulate the output, use the 'samp' tag:</p>
+<samp>
+demo.example.com login: Apr 12 09:10:17
+Linux 2.6.10-grsec+gg3+e+fhs6b+nfs+gr0501+++p3+c4a+gr2b-reslog-v6.189
+</samp>
+
+<hr>
+<h2>Links<h2>
+<a href="http://www.yahoo.com">Goto Yahoo in this browser tab</a><br>
+<a href="http://www.yahoo.com" target="_blank">Goto Yahoo in a new browser tab</a>
+<a href="http://www.yahoo.com" target="_blank"><br>
+   <img src="car_add.png" alt="goto yahoo" style="width:100px;height:100px;border:1">
+</a></br>
+<a href="#top">Go to the top of the page with an internal href</a><br>
+<a href="css.html#firstP" target="_blank">Got to the first 'p' tag on the css.html file</a><br>
+<br>
+if you want an image that has clickable areas then use an image with a 'usemap=' attribute that points to an image map.
+<button onclick="window.open().location.assign('http://www.w3schools.com/html/html_images.asp')">Click here and go to the Image Maps at bottom for sample</button>
+</body>
+</html> 
