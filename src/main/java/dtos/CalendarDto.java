@@ -12,7 +12,10 @@ public class CalendarDto {
     public String getDayOfMonth() {
         return dayOfMonth;
     }
-
+    public int getIntDayOfMonth()
+    {
+        return Integer.parseInt(dayOfMonth);
+    }
     public double getHours() {
         return hours;
     }

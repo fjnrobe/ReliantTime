@@ -135,6 +135,46 @@ public class SortUtils {
         }
     }
 
+    private static class HoursCalendarComparator implements Comparator<TimesheetDto> {
+
+        public int compare (TimesheetDto object1, TimesheetDto object2)
+        {
+            int retValue = 0;
+
+            if (object1.getWeekOfMonth() < object2.getWeekOfMonth())
+            {
+                retValue = -1;
+            }
+            else if (object1.getWeekOfMonth() > object2.getWeekOfMonth())
+            {
+                retValue = 1;
+            }
+            //when in the same week, sort by day of week
+            else
+            {
+                if (object1.getDayOfWeek() < object2.getDayOfWeek())
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+
+            return retValue;
+        }
+    }
+
+    public static List<TimesheetDto> sortHoursCalendarByWeekAndDay(List<TimesheetDto> reportRecords)
+    {
+        HoursCalendarComparator comparator = new HoursCalendarComparator();
+
+        Collections.sort(reportRecords, comparator);
+
+        return reportRecords;
+    }
+
     public static List<FinancialSummaryByYearUIDto> sortFinancialSummaryByYearUIDto(List<FinancialSummaryByYearUIDto> dtos, boolean ascending)
     {
         FinancialSummaryByYearComparator comparator = new FinancialSummaryByYearComparator();

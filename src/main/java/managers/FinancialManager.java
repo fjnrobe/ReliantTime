@@ -37,6 +37,7 @@ public class FinancialManager {
         PurchaseOrderDto purchaseOrderDto =
                 this.purchaseOrderDao.getPurchaseOrderByMonthYear(monthYear);
 
+        nextInvoice.setMonthYear(monthYear);
         nextInvoice.setPoNumber(purchaseOrderDto.getPoNumber());
         nextInvoice.setInvoiceNumber("RSLLC-" + monthYear.getMonthYear());
 
@@ -171,7 +172,7 @@ public class FinancialManager {
             }
 
             //make sure the invoice monthyear are within the PO range
-            if (DateTimeUtils.isDateBetween(DateTimeUtils.convertMonthYear(dto.getMonthYear()),
+            if (!DateTimeUtils.isDateBetween(DateTimeUtils.convertMonthYear(dto.getMonthYear()),
                     purchaseOrderDto.getStartDate(), purchaseOrderDto.getEndDate()))
             {
                 errorDtos.add(new ErrorDto("This invoice is not within the purchase order effective date range"));
@@ -200,7 +201,7 @@ public class FinancialManager {
 
         //update the running amounts/dollars on the invoice and the po
         dto.setPriorHoursRemaining(purchaseOrderDto.getTotalHours() - purchaseOrderDto.getTotalHoursBilled());
-        dto.setAmtRemaining(dto.getPriorAmtRemaining() * purchaseOrderDto.getHourlyRate());
+        dto.setPriorAmtRemaining(dto.getPriorHoursRemaining() * purchaseOrderDto.getHourlyRate());
 
         purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() +
                                                 dto.getHours());
@@ -210,8 +211,12 @@ public class FinancialManager {
 
         this.purchaseOrderDao.updatePurchaseOrder(purchaseOrderDto);
 
-        return this.invoiceDao.addInvoice(dto);
+        ObjectId id = invoiceDao.addInvoice(dto);
+        dto.setId(id);
+        //now, roll forward to update any later effective invoice hours/amt remaining
+        this.updateInvoiceBalances(dto);
 
+        return id;
     }
 
     public void updateInvoice(InvoiceDto dto) {
@@ -227,7 +232,7 @@ public class FinancialManager {
 
         //update the running amounts/dollars on the invoice and the po
         dto.setPriorHoursRemaining(purchaseOrderDto.getTotalHours() - purchaseOrderDto.getTotalHoursBilled());
-        dto.setAmtRemaining(dto.getPriorAmtRemaining() * purchaseOrderDto.getHourlyRate());
+        dto.setPriorAmtRemaining(dto.getPriorHoursRemaining() * purchaseOrderDto.getHourlyRate());
 
         purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() +
                 dto.getHours());
@@ -238,6 +243,9 @@ public class FinancialManager {
         this.purchaseOrderDao.updatePurchaseOrder(purchaseOrderDto);
 
         this.invoiceDao.updateInvoice(dto);
+
+        //now, roll forward to update any later effective invoice hours/amt remaining
+        this.updateInvoiceBalances(dto);
     }
 
     public void deleteInvoice(ObjectId id)
@@ -248,10 +256,53 @@ public class FinancialManager {
         PurchaseOrderDto purchaseOrderDto = this.purchaseOrderDao.
                 getPurchaseOrderByPONumber(origDto.getPoNumber());
 
-        //back out the original amounts
-        purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() - origDto.getHours());
+        if (purchaseOrderDto != null) {
+            //back out the original amounts
+            purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() - origDto.getHours());
 
-        this.purchaseOrderDao.updatePurchaseOrder(purchaseOrderDto);
+            this.purchaseOrderDao.updatePurchaseOrder(purchaseOrderDto);
+        }
         this.invoiceDao.deleteInvoice(id);
+    }
+
+    private void updateInvoiceBalances(InvoiceDto currentDto)
+    {
+        FinancialSearchCriteriaDto searchCriteriaDto = new FinancialSearchCriteriaDto();
+        searchCriteriaDto.setPoNumber(currentDto.getPoNumber());
+
+        List<InvoiceDto> allInvoiceDtos = this.getInvoicesByCriteria(searchCriteriaDto);
+
+        SortUtils.sortFinancialDto(allInvoiceDtos, true);
+
+        boolean found = false;
+        InvoiceDto priorInvoiceDto = null;
+        //find the entry for the currentDto - we will then update all invoices effective later
+        for (InvoiceDto invoiceDto : allInvoiceDtos)
+        {
+
+            //if there is no prior invoice, it means we are on the first invoice
+            if (priorInvoiceDto == null) {
+
+                PurchaseOrderDto purchaseOrderDto =
+                        this.purchaseOrderDao.getPurchaseOrderByPONumber(currentDto.getPoNumber());
+
+                invoiceDto.setPriorHoursRemaining(purchaseOrderDto.getTotalHours());
+                invoiceDto.setPriorAmtRemaining(purchaseOrderDto.getTotalHours() * purchaseOrderDto.getHourlyRate());
+
+                invoiceDto.setHoursRemaining(purchaseOrderDto.getTotalHours() - invoiceDto.getHours());
+                invoiceDto.setAmtRemaining(invoiceDto.getPriorAmtRemaining() - invoiceDto.getTotalGross());
+            }
+            else
+            {
+                invoiceDto.setPriorAmtRemaining(priorInvoiceDto.getAmtRemaining());
+                invoiceDto.setPriorHoursRemaining(priorInvoiceDto.getHoursRemaining());
+                invoiceDto.setHoursRemaining(priorInvoiceDto.getHoursRemaining() - invoiceDto.getHours());
+                invoiceDto.setAmtRemaining(priorInvoiceDto.getAmtRemaining() - invoiceDto.getTotalGross());
+            }
+            this.invoiceDao.updateInvoice(invoiceDto);
+
+            priorInvoiceDto = invoiceDto;
+
+        }
     }
 }

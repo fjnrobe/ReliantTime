@@ -89,6 +89,9 @@ public class FinancialUIHelper {
             dto.setId(new ObjectId(request.queryParams("delId")));
         }
 
+        dto.setPoNumber(request.queryParams("poNumber"));
+        dto.setInvoiceNumber(request.queryParams("invoiceNumber"));
+
         if (!StringUtils.isEmpty(request.queryParams("monthYear")))
         {
 
@@ -157,7 +160,7 @@ public class FinancialUIHelper {
                 List<InvoiceDto> poInvoices =
                         financialManager.getInvoicesByCriteria(searchDto);
 
-                root.put("invoices", poInvoices);
+                root.put("invoices", SortUtils.sortFinancialDto(poInvoices, true));
 
                 //now add all the calced totals
                 double totalGross = allPo.getHourlyRate() * allPo.getTotalHours();

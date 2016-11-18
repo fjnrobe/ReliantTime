@@ -25,7 +25,8 @@ public class DateTimeUtils {
 		MMDDYYYY,
 		YYYYMMDD,
 		YYYYMM,
-		ISO
+		ISO,
+		MMMDDYYYY
 	}
 	
 	public static String LOW_DATE = "18000101";
@@ -158,7 +159,14 @@ public class DateTimeUtils {
 
 		String retDate = null;
 
-		if (format == DateFormats.ISO)
+		if (format == DateFormats.MMMDDYYYY)
+		{
+			if (date != null) {
+				DateFormat df = new SimpleDateFormat("MMM dd,yyyy");
+				retDate = df.format(date);
+			}
+		}
+		else if (format == DateFormats.ISO)
 		{
 			if (date != null) {
 				DateFormat df1 = new SimpleDateFormat("MMM d, yyyy h:mm:ss a");
@@ -226,6 +234,7 @@ public class DateTimeUtils {
 		return stringDate;
 		
 	}
+
 
     public static Date stringToDate(String date, DateFormats format)
     {

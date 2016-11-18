@@ -668,6 +668,59 @@ public class MainController {
             }
         });
 
+        //REST call
+        //get the timesheet
+        get(new Route(URLConstants.REPORT_MONTHLY_TIMESHEET_XLS) {
+            @Override
+            public Object handle(Request request, Response response) {
+                MonthYear yearMonth = new MonthYear(request.params(":yearMonth"));
+
+                response.type("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                response.header("Content-Disposition", "attachment; filename=timesheet.xls");
+                reportManager.setLogManager(logManager);
+            //    byte[] xls = reportManager.createMonthlyTimesheet(yearMonth);
+
+//                try {
+//
+//                    response.raw().getOutputStream().write(xls);
+//                    response.raw().flushBuffer();
+//
+//                } catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
+
+                return null;
+            }
+        });
+
+        //REST call
+        //invoked to generate/get the invoice for the incoming invoice number
+        get(new Route(URLConstants.REPORT_MONTHLY_INVOICE_XLS) {
+            @Override
+            public Object handle(Request request, Response response) {
+                String invoiceNumber = request.params(":invoiceNumber");
+
+                response.type("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                response.header("Content-Disposition", "attachment; filename=filename.xls");
+                reportManager.setLogManager(logManager);
+                byte[] xls = reportManager.createInvoicePackage(invoiceNumber);
+
+                try {
+
+                    response.raw().getOutputStream().write(xls);
+                    response.raw().flushBuffer();
+
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        });
+
+
         //called to load the SIR list page,
         get (new FreemarkerBasedRoute(URLConstants.MAINT_SIR_LIST, TemplateConstants.SIR_LIST) {
             @Override
@@ -1087,7 +1140,9 @@ public class MainController {
             @Override
             public Object handle(Request request, Response response) {
 
-                return convertToJSON(financialManager.getNextInvoice(DateTimeUtils.getLastMonthYear(new Date())));
+                InvoiceDto dto = financialManager.getNextInvoice(DateTimeUtils.getLastMonthYear(new Date()));
+                String json = convertToJSON(dto);
+                return json;
             }
         });
 

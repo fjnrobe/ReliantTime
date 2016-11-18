@@ -35,16 +35,45 @@ public class InvoiceDao extends BaseDao{
 
     public List<InvoiceDto> getInvoicesByCriteria(FinancialSearchCriteriaDto searchDto)
     {
+        List<InvoiceDto> invoiceDtos = new ArrayList<InvoiceDto>();
         Bson whereFilter = null;
-
+        Bson poFilter = null;
+        Bson invoiceFilter = null;
+        Bson yearFilter = null;
         if (!StringUtils.isEmpty(searchDto.getPoNumber()))
         {
-            whereFilter = Filters.eq(FieldConstants.PO_NUMBER, searchDto.getPoNumber());
+            poFilter = Filters.eq(FieldConstants.PO_NUMBER, searchDto.getPoNumber());
         }
+
+        if (!StringUtils.isEmpty(searchDto.getInvoiceNumber()))
+        {
+            invoiceFilter = Filters.eq(FieldConstants.INVOICE_NUMBER, searchDto.getInvoiceNumber());
+        }
+
         if (!StringUtils.isEmpty(searchDto.getYear()))
         {
-            Bson yearFilter = Filters.regex( FieldConstants.MONTH_YEAR, "^" + searchDto.getYear());
+            yearFilter = Filters.regex( FieldConstants.MONTH_YEAR, "^" + searchDto.getYear());
+
+        }
+
+        if (poFilter != null)
+        {
+            whereFilter = poFilter;
+        }
+        if (invoiceFilter != null)
+        {
             if (whereFilter == null)
+            {
+                whereFilter = invoiceFilter;
+            }
+            else
+            {
+                whereFilter = Filters.and(whereFilter, invoiceFilter);
+            }
+        }
+        if (yearFilter != null)
+        {
+            if (whereFilter== null)
             {
                 whereFilter = yearFilter;
             }
@@ -54,7 +83,11 @@ public class InvoiceDao extends BaseDao{
             }
         }
 
-        return super.getList(whereFilter);
+        if (whereFilter != null) {
+            invoiceDtos =super.getList(whereFilter);
+        }
+
+        return invoiceDtos;
     }
 
     public InvoiceDto getInvoiceById(ObjectId id)

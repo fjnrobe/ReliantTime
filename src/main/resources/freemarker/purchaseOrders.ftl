@@ -138,23 +138,23 @@
                                 <tr>
                                     <td><b>Total</b></td>
                                     <td><span id="totalHours">${totalHours!0.0}</span></td>
-                                    <td><span id="totalGross">${totalGross!0.0}</span></td>
-                                    <td><span id="totalPassthru">${totalPassthru!0.0}</span></td>
-                                    <td><span id="totalAdjustedGross">${totalAdjustedGross!0.0}</span></td>
+                                    <td><span id="totalGross">${totalGross?string.currency}</span></td>
+                                    <td><span id="totalPassthru">${totalPassthru?string.currency}</span></td>
+                                    <td><span id="totalAdjustedGross">${totalAdjustedGross?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Billed</b></td>
                                     <td><span id="billedHours">${billedHours!0.0}</span></td>
-                                    <td><span id="billedGross">${billedGross!0.0}</span></td>
-                                    <td><span id="billedPassthru">${billedPassthru!0.0}</span></td>
-                                    <td><span id="billedAdjustedGross">${billedAdjustedGross!0.0}</span></td>
+                                    <td><span id="billedGross">${billedGross?string.currency}</span></td>
+                                    <td><span id="billedPassthru">${billedPassthru?string.currency}</span></td>
+                                    <td><span id="billedAdjustedGross">${billedAdjustedGross?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Due</b></td>
                                     <td><span id="dueHours">${dueHours!0.0}</span></td>
-                                    <td><span id="dueGross">${dueGross!0.0}</span></td>
-                                    <td><span id="duePassthru">${duePassthru!0.0}</span></td>
-                                    <td><span id="dueAdjustedGross">${dueAdjustedGross!0.0}</span></td>
+                                    <td><span id="dueGross">${dueGross?string.currency}</span></td>
+                                    <td><span id="duePassthru">${duePassthru?string.currency}</span></td>
+                                    <td><span id="dueAdjustedGross">${dueAdjustedGross?string.currency}</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -187,13 +187,13 @@
                                     <#list invoices as row>
                                         <tr>
                                           <td>${row.invoiceNumber!""}</td>
-                                          <td>${row.monthYear!""}</td>
-                                          <td>${row.priorHoursRemaining!0.0}</td>
-                                          <td>${row.priorAmtRemaining!0.0}</td>
+                                          <td>${row.monthYearAsString!""}</td>
+                                          <td>${row.priorHoursRemaining}</td>
+                                          <td>${row.priorAmtRemaining?string.currency}</td>
                                           <td>${row.hours!0.0}</td>
-                                          <td>${row.totalGross!0.0}</td>
+                                          <td>${row.totalGross?string.currency}</td>
                                           <td>${row.hoursRemaining!0.0}</td>
-                                          <td>${row.amtRemaining!0.0}</td>
+                                          <td>${row.amtRemaining?string.currency}</td>
                                         </tr>
                                     </#list>
                                  </#if>

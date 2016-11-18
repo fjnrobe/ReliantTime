@@ -72,7 +72,11 @@
                                     <td><a id="lnkDelete&${row?index}" onclick="deleteRevenueEntry(this)">
                                         <span class="glyphicon glyphicon-remove-sign"></span>
                                     </td>
-                                </tr>
+                                    <td>
+                                      <a id="lnkDownLoad&${row?index}"
+                                         href="/reports/invoice/${row.invoiceNumber}">
+                                         <span class="glyphicon glyphicon-download"></span>
+                                    </td>
                             </#list>
                         </#if>
                     </tbody>

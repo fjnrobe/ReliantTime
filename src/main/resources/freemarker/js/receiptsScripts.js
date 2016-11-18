@@ -56,6 +56,11 @@ function loadInvoiceTable(invoiceList)
         lnkDelete.click(function() {
            deleteRevenueEntry(this);
         });
+
+        newCol = $("<td>").appendTo(newRow);
+        var lnkDownload = $("<a>", {id: "lnkDownLoad&" + i, href: "/reports/invoice/" + invoiceList[i].invoiceNumber}).appendTo(newCol);
+        var glyphDelete = $("<span>", {class: "glyphicon glyphicon-download"}).appendTo(lnkDownload);
+
      }
 
 }
@@ -68,10 +73,10 @@ function addRevenueEntry()
     $("#id").val("");
     $("#poNumber").val(nextInvoiceData.poNumber);
     $("#invoiceNumber").val(nextInvoiceData.invoiceNumber);
-    $("#monthYear").val(nextInvoiceData.monthYearAsString);
+    $("#monthYear").val( monthYearAsYYYYMM(nextInvoiceData.monthYearAsString));
     $("#hours").val(nextInvoiceData.hours);
-    $("#gross").val(nextInvoiceData.gross);
-    $("#invDate").val(nextInvoiceData.invoiceDate);
+    $("#gross").val(nextInvoiceData.totalGross);
+    $("#invDate").val(dateAsYYYYMMDD(nextInvoiceData.invoiceDate));
     $("#recvDate").val("");
 
     $("#editEntryModal").modal("show");
@@ -85,22 +90,15 @@ function editRevenueEntry(revenueEntry)
     var selectedValue = $(revenueEntry).attr("id");
     var values = selectedValue.split('&');
 
-   // var tmp = $("#revenueListData").val();
-   // revenueListArray = JSON.parse(tmp);
-    var date = new Date(revenueListArray[values[1]].invoiceDate);
-    var invoiceDate =  date.getFullYear() + "-" +
-                    String("0" + (date.getMonth() + 1)).slice(-2) + "-" +
-                    String("0" + date.getDate()).slice(-2);
+    var invoiceDate = dateAsYYYYMMDD(revenueListArray[values[1]].invoiceDate);
 
-    date = new Date(revenueListArray[values[1]].receivedDate);
-    var receivedDate =  date.getFullYear() + "-" +
-                    String("0" + (date.getMonth() + 1)).slice(-2) + "-" +
-                    String("0" + date.getDate()).slice(-2);
+    var receivedDate = dateAsYYYYMMDD(revenueListArray[values[1]].receivedDate);
 
-    var monthYear = revenueListArray[values[1]].monthYearAsString.slice(0,4) + "-" +
-                     revenueListArray[values[1]].monthYearAsString.slice(4);
+    var monthYear = monthYearAsYYYYMM(revenueListArray[values[1]].monthYearAsString);
 
     $("#id").val(revenueListArray[values[1]].idAsString);
+    $("#poNumber").val(revenueListArray[values[1]].poNumber);
+    $("#invoiceNumber").val(revenueListArray[values[1]].invoiceNumber);
     $("#monthYear").val(monthYear);
     $("#hours").val(revenueListArray[values[1]].hours);
     $("#gross").val(revenueListArray[values[1]].totalGross);
@@ -116,9 +114,6 @@ function deleteRevenueEntry(deductionEntry)
 {
         var selectedValue = $(deductionEntry).attr("id");
             var values = selectedValue.split('&');
-
-      //      var tmp = $("#revenueListData").val();
-      //      revenueListArray = JSON.parse(tmp);
 
        $("#delId").val(revenueListArray[values[1]].idAsString);
 
