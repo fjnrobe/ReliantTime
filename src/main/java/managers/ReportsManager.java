@@ -1365,6 +1365,7 @@ public class ReportsManager {
             monthYear.setYearName(String.valueOf(calDate.get(Calendar.YEAR)));
 
             String monthNumber = "";
+
             int month = calDate.get(Calendar.MONTH) + 1;
 
             monthYear.setMonth(month);
