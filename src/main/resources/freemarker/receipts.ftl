@@ -31,7 +31,11 @@
                            <select class="form-control" id="dropYears" name="dropYears">
                               <#if yearList??>
                                   <#list yearList as year>
-                                      <option value="${year}">${year}</option>
+                                      <#if (selectedYear!"") == year>
+                                          <option value="${year}" selected>${year}</option>
+                                      <#else>
+                                        <option value="${year}">${year}</option>
+                                      </#if>
                                   </#list>
                               </#if>
                            </select>
@@ -96,22 +100,24 @@
                                    <tr>
                                      <th>Year</th>
                                      <th>Gross Revenue</th>
+                                     <th>Received Revenue</th>
 
                                    </tr>
                                  </thead>
                                  <tbody  id="tblRevenueSummary">
                                      <#if revenueSummary??>
                                          <#assign totGrossRevenue = 0>
-
+                                         <#assign totRecvRevenue = 0>
                                          <#list revenueSummary as row>
                                              <tr>
 
                                                 <td>${row.monthYear.sortKey}</td>
                                                 <td style="text-align: right">${row.totalGross?string.currency}</td>
-
+                                                <td style="text-align: right">${row.totalRecvGross?string.currency}</td>
                                               </tr>
 
                                              <#assign totGrossRevenue = totGrossRevenue + row.totalGross>
+                                             <#assign totRecvRevenue = totRecvRevenue + row.totalRecvGross>
 
 
                                          </#list>
@@ -119,7 +125,7 @@
                                              <tr>
                                                 <td><b>All Years</b></td>
                                                 <td style="text-align: right"><b>${totGrossRevenue?string.currency}</b></td>
-
+                                                <td style="text-align: right"><b>${totRecvRevenue?string.currency}</b></td>
 
                                              </tr>
                                          </tfoot>

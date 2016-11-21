@@ -11,23 +11,16 @@ function getMonthlyStatus()
 {
     var monthYear = $("#monthYears").val();
 
-//     $.ajax({url: "/reports/monthlyStatus/" + monthYear, async: false, success: function(result){
-//                 alert("got " + results);
-//                     }});
 
-//                     $.get("/reports/monthlyStatus/" + monthYear, function(data, status){
-//                            alert("got " + data);
-//                         });
 }
 
 // Download a file form a url.
 function getMonthlyStatus() {
   var monthYear = $("#monthYears").val();
 
-  var filename = "Monthly Status Report For " + $("#monthYears option:selected").text() + " J_Robertson_PO_xxxx.xls";
+  var filename = "Monthly Status Report For " + $("#monthYears option:selected").text() + " J_Robertson.xls";
   var xhr = new XMLHttpRequest();
   xhr.responseType = "blob";
-  //xhr.overrideMimeType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
   xhr.onload = function() {
     var a = document.createElement('a');
@@ -45,23 +38,3 @@ function getMonthlyStatus() {
   xhr.send();
 }
 
-//function getMonthlyStatus() {
-//
-//  var monthYear = $("#monthYears").val();
-//
-//  var filename = "Monthly Status Report For " + $("#monthYears option:selected").text() + " J_Robertson_PO_xxxx.xlsx";
-//
-//var xhr = new XMLHttpRequest();
-//xhr.onreadystatechange = function(){
-//    if (this.readyState == 4 && this.status == 200){
-//        var blobURL = window.URL.createObjectURL(this.response);
-//        var anchor = document.createElement('a');
-//        anchor.download = 'filename.xlsx';
-//        anchor.href = blobURL;
-//        anchor.click();
-//    }
-//}
-//xhr.open('GET', "/reports/monthlyStatus/" + monthYear);
-//xhr.responseType = 'blob'; // Get a binary response
-//xhr.send();
-//  }

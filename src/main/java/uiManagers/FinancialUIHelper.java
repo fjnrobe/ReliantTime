@@ -172,11 +172,16 @@ public class FinancialUIHelper {
                 root.put("totalAdjustedGross", totalGross - totalPassthru);
 
                 double billedHours = 0.0;
+                double receivedHours = 0.0;
                 totalGross = 0.0;
                 totalPassthru = 0.0;
                 for (InvoiceDto invoice : poInvoices)
                 {
                     billedHours += invoice.getHours();
+                    if (!DateTimeUtils.isNullDate(invoice.getReceivedDate()))
+                    {
+                        receivedHours += invoice.getHours();
+                    }
                     totalGross += invoice.getTotalGross();
                     totalPassthru += (invoice.getHours() * allPo.getPassthruRate() );
 
@@ -186,13 +191,23 @@ public class FinancialUIHelper {
                 root.put("billedPassthru", totalPassthru);
                 root.put("billedAdjustedGross", totalGross - totalPassthru);
 
-                double dueHours = allPo.getTotalHours() - billedHours;
+                double dueHours = billedHours - receivedHours;
                 double dueGross = dueHours * allPo.getHourlyRate();
                 double duePassthru = dueHours * allPo.getPassthruRate();
+
                 root.put("dueHours", dueHours);
                 root.put("dueGross", dueGross);
                 root.put("duePassthru", duePassthru);
                 root.put("dueAdjustedGross", dueGross - duePassthru);
+
+                double remHours = allPo.getTotalHours() - billedHours;
+                double remGross = remHours * allPo.getHourlyRate();
+                double remPassthru = remHours * allPo.getPassthruRate();
+
+                root.put("remHours", remHours);
+                root.put("remGross", remGross);
+                root.put("remPassthru", remPassthru);
+                root.put("remAdjustedGross", remGross - remPassthru);
             }
         }
 
@@ -223,12 +238,17 @@ public class FinancialUIHelper {
 
                 entry.setHours(0.0);
                 entry.setTotalGross(0.0);
+                entry.setTotalRecvGross(0.0);
                 map.put(key, entry);
             }
 
             entry.setHours(entry.getHours() + dto.getHours());
-            entry.setTotalGross(entry.getTotalGross() + dto.getTotalGross());
 
+            entry.setTotalGross(entry.getTotalGross() + dto.getTotalGross());
+            if (!DateTimeUtils.isNullDate(dto.getReceivedDate()))
+            {
+                entry.setTotalRecvGross(entry.getTotalRecvGross() + dto.getTotalGross());
+            }
         }
 
         for (String key : map.keySet())

@@ -131,6 +131,9 @@ public class SIRUIHelper {
         HashMap<String, Object> root = new HashMap<String, Object>();
 
         List<SirPcrUIDto> results = new ArrayList<SirPcrUIDto>();
+
+        SortUtils.sortBySirNumber(dtos, false);
+
         for (SirPcrDto dto : dtos)
         {
             SirPcrUIDto uiDto = new SirPcrUIDto();
@@ -139,6 +142,7 @@ public class SIRUIHelper {
 
             results.add(uiDto);
         }
+
 
         root.put("sirList", results);
         root.put("sirCount", results.size());

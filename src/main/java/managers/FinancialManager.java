@@ -199,15 +199,17 @@ public class FinancialManager {
         PurchaseOrderDto purchaseOrderDto = this.purchaseOrderDao.
                 getPurchaseOrderByPONumber(dto.getPoNumber());
 
+        dto.setTotalGross(dto.getHours() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
+
         //update the running amounts/dollars on the invoice and the po
         dto.setPriorHoursRemaining(purchaseOrderDto.getTotalHours() - purchaseOrderDto.getTotalHoursBilled());
-        dto.setPriorAmtRemaining(dto.getPriorHoursRemaining() * purchaseOrderDto.getHourlyRate());
+        dto.setPriorAmtRemaining(dto.getPriorHoursRemaining() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
 
         purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() +
                                                 dto.getHours());
 
         dto.setHoursRemaining(purchaseOrderDto.getTotalHours() - purchaseOrderDto.getTotalHoursBilled());
-        dto.setAmtRemaining(dto.getHoursRemaining() * purchaseOrderDto.getHourlyRate());
+        dto.setAmtRemaining(dto.getHoursRemaining() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
 
         this.purchaseOrderDao.updatePurchaseOrder(purchaseOrderDto);
 
@@ -230,15 +232,17 @@ public class FinancialManager {
         //back out the original amounts
         purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() - origDto.getHours());
 
+        dto.setTotalGross(dto.getHours() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
+
         //update the running amounts/dollars on the invoice and the po
         dto.setPriorHoursRemaining(purchaseOrderDto.getTotalHours() - purchaseOrderDto.getTotalHoursBilled());
-        dto.setPriorAmtRemaining(dto.getPriorHoursRemaining() * purchaseOrderDto.getHourlyRate());
+        dto.setPriorAmtRemaining(dto.getPriorHoursRemaining() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
 
         purchaseOrderDto.setTotalHoursBilled(purchaseOrderDto.getTotalHoursBilled() +
                 dto.getHours());
 
         dto.setHoursRemaining(purchaseOrderDto.getTotalHours() - purchaseOrderDto.getTotalHoursBilled());
-        dto.setAmtRemaining(dto.getHoursRemaining() * purchaseOrderDto.getHourlyRate());
+        dto.setAmtRemaining(dto.getHoursRemaining() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
 
         this.purchaseOrderDao.updatePurchaseOrder(purchaseOrderDto);
 
@@ -270,6 +274,9 @@ public class FinancialManager {
         FinancialSearchCriteriaDto searchCriteriaDto = new FinancialSearchCriteriaDto();
         searchCriteriaDto.setPoNumber(currentDto.getPoNumber());
 
+        PurchaseOrderDto purchaseOrderDto =
+                this.purchaseOrderDao.getPurchaseOrderByPONumber(currentDto.getPoNumber());
+
         List<InvoiceDto> allInvoiceDtos = this.getInvoicesByCriteria(searchCriteriaDto);
 
         SortUtils.sortFinancialDto(allInvoiceDtos, true);
@@ -283,17 +290,19 @@ public class FinancialManager {
             //if there is no prior invoice, it means we are on the first invoice
             if (priorInvoiceDto == null) {
 
-                PurchaseOrderDto purchaseOrderDto =
-                        this.purchaseOrderDao.getPurchaseOrderByPONumber(currentDto.getPoNumber());
+                invoiceDto.setTotalGross(invoiceDto.getHours() * (purchaseOrderDto.getHourlyRate() -
+                        purchaseOrderDto.getPassthruRate()));
 
                 invoiceDto.setPriorHoursRemaining(purchaseOrderDto.getTotalHours());
-                invoiceDto.setPriorAmtRemaining(purchaseOrderDto.getTotalHours() * purchaseOrderDto.getHourlyRate());
+                invoiceDto.setPriorAmtRemaining(purchaseOrderDto.getTotalHours() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate()));
 
                 invoiceDto.setHoursRemaining(purchaseOrderDto.getTotalHours() - invoiceDto.getHours());
                 invoiceDto.setAmtRemaining(invoiceDto.getPriorAmtRemaining() - invoiceDto.getTotalGross());
             }
             else
             {
+                invoiceDto.setTotalGross(invoiceDto.getHours() * (purchaseOrderDto.getHourlyRate() -
+                        purchaseOrderDto.getPassthruRate()));
                 invoiceDto.setPriorAmtRemaining(priorInvoiceDto.getAmtRemaining());
                 invoiceDto.setPriorHoursRemaining(priorInvoiceDto.getHoursRemaining());
                 invoiceDto.setHoursRemaining(priorInvoiceDto.getHoursRemaining() - invoiceDto.getHours());

@@ -1,64 +1,51 @@
-<div class="headerframe">
-    <div class="header">
-        <div class="row">
-            <div class="col-md-2">
-
-              <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Log Time
-                <span class="caret"></span></button>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Reliant Software</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Log Time<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-
-                      <li><a href="/calendar">Calendar</a></li>
-                      <li><a href="/dayEntry">Today</a><li>
+                        <li><a href="/calendar">Calendar</a></li>
+                        <li><a href="/dayEntry">Today</a><li>
                     </ul>
-              </div>
-            </div>
-
-            <div class="col-md-2">
-
-              <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Maintenance
-                <span class="caret"></span></button>
+                </li>
+                <li><a href="/sirList">SIR List</a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Tables<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-
-                      <li><a href="/sirList">SIR List</a></li>
-
+                        <li><a href="/lovTables">Lov Tables</a></li>
                     </ul>
-              </div>
-            </div>
-
-            <div class="col-md-2">
-
-              <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Tables
-                <span class="caret"></span></button>
+                </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Reports<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li><a href="/lovTables">Lov Tables</a></li>
-                      <li><a href="/deductions">Deductions</a></li>
-                      <li><a href="/revenue">Receipts</a></li>
+                        <li class="dropdown-header">Status</li>
+                        <li><a href="/reports/innotas/">Weekly Innotas</a></li>
+                        <li><a href="/reports/monthlyStatus">Monthly Status</a></li>
                     </ul>
-              </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Reports
-                    <span class="caret"></span></button>
+                </li>
+                <li>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Financials<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li class="dropdown-header">Status</li>
-                      <li><a href="/reports/innotas/">Weekly Innotas</a></li>
-                      <li><a href="/reports/monthlyStatus">Monthly Status</a></li>
-                      <li><a href="#">Invoice</a></li>
-                      <li><a href="#">Timesheet</a></li>
-                      <li class="divider"></li>
-                      <li class="dropdown-header">Financial</li>
-                      <li><a href="/financialSummary">Yearly Summary</a></li>
-                      <li><a href="/purchaseOrders">Purchase Orders</a></li>
+                        <li><a href="/financialSummary">Yearly Summary</a></li>
+                        <li><a href="/purchaseOrders">Purchase Orders</a></li>
+                        <li><a href="/revenue">Invoices</a></li>
+                        <li><a href="/deductions">Deductions</a></li>
                     </ul>
-                  </div>
-                </div>
-            </div>
+                </li>
+            </ul>
+            <!--<ul class="nav navbar-nav navbar-right">-->
+                <!--<li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>-->
+                <!--<li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>-->
+            <!--</ul>-->
         </div>
     </div>
-</div>
-<input type="hidden" name="passcode" value="${passcode!""}">
+</nav>

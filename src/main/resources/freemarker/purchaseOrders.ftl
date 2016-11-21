@@ -40,7 +40,7 @@
 
                         <div class="form-group">
                             <label class="control-label col-md-1" for="poDropdown">Select PO:</label>
-                            <div class="col-md-11">
+                            <div class="col-md-5">
                                 <select class="form-control" id="poDropdown" name="poDropdown">
                                     <option></option>
                                     <#if poList??>
@@ -58,6 +58,8 @@
                                         </#list>
                                     </#if>
                                 </select>
+                            </div>
+                            <div class="col-md-1">
                                 <input class="btn btn-default" id="btnAddPo" type="button" value="Add New">
                             </div>
                         </div>
@@ -156,6 +158,14 @@
                                     <td><span id="duePassthru">${duePassthru?string.currency}</span></td>
                                     <td><span id="dueAdjustedGross">${dueAdjustedGross?string.currency}</span></td>
                                 </tr>
+                                <tr>
+                                    <td><b>Remaining</b></td>
+                                    <td><span id="remHours">${remHours!0.0}</span></td>
+                                    <td><span id="remGross">${remGross?string.currency}</span></td>
+                                    <td><span id="remPassthru">${remPassthru?string.currency}</span></td>
+                                    <td><span id="remAdjustedGross">${remAdjustedGross?string.currency}</span></td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </well>

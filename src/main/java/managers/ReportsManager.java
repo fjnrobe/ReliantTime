@@ -970,6 +970,8 @@ public class ReportsManager {
         List<ReportRecordDto> reportData =this.generateMonthAtAGlanceReport(monthYear);
         Map<ObjectId, SirPcrViewDto> sirSummary = this.logDao.getSirSummaryRangeInfo();
 
+        HSSFCellStyle headerCell = this.createStyle(workbook, true, true, true, false);
+        HSSFCellStyle detailCell = this.createStyle(workbook, false, false, true, false);
 
         try {
 
@@ -987,7 +989,7 @@ public class ReportsManager {
             cell.setCellValue("Jeff Robertson's Monthly Status Report For " +
                                 monthYear.getMonthName() + " " +
                                 monthYear.getYearName());
-            cell.setCellStyle(this.createStyle(workbook, true, true,true,true));
+            cell.setCellStyle(headerCell);
 
 
             for (ReportRecordDto data : reportData)
@@ -1014,37 +1016,37 @@ public class ReportsManager {
 
                     cell = row.createCell(0);
                     cell.setCellValue(line);
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     colIdx = 0;
                     row = sheet.createRow(rowIdx++);
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("Activity Type");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("Status");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("Est Compl. Date");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("Total LOE Hrs");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("Sub Process/Activity");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("SCR / SIR / PCR");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     cell = row.createCell(colIdx++);
                     cell.setCellValue("Activity Reference and Description of Accomplishments/Tasks");
-                    cell.setCellStyle(this.createStyle(workbook, true, false,true,true));
+                    cell.setCellStyle(headerCell);
 
                     row = sheet.createRow(rowIdx++);
 
@@ -1127,33 +1129,31 @@ public class ReportsManager {
                 row = sheet.createRow(rowIdx++);
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(data.getSirPcrViewDto().getLogDto().getActivityDesc());
-                cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+                cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(statusDesc);
-                cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+                cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(estCompleteDate);
-                cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+                cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(String.valueOf(NumberUtils.roundHours(data.getHoursWithinWeek())));
-                cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+                cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(data.getSirPcrViewDto().getSirPcrDto().getSubProcessDesc());
-                cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+                cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(sirNumber);
-                cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+                cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
                 cell.setCellValue(data.getSirPcrViewDto().getSirPcrDto().getSirDesc());
-                HSSFCellStyle style = this.createStyle(workbook, false, false, true, false);
-                style.setWrapText(true);
-                cell.setCellStyle(style);
+                cell.setCellStyle(detailCell);
 
                 monthTotalHours += data.getHoursWithinWeek();
 
@@ -1165,7 +1165,15 @@ public class ReportsManager {
             row = sheet.createRow(rowIdx++);
             cell = row.createCell(0);
             cell.setCellValue("Total Monthly Hours: " + String.valueOf(NumberUtils.roundHours(monthTotalHours)));
-            cell.setCellStyle(this.createStyle(workbook, false, false, true, false));
+            cell.setCellStyle(headerCell);
+
+            sheet.setColumnWidth(0, 20*256);
+            sheet.setColumnWidth(1, 11*256);
+            sheet.setColumnWidth(2, 16*256);
+            sheet.setColumnWidth(3, 15*256);
+            sheet.setColumnWidth(4, 24*256);
+            sheet.setColumnWidth(5, 17*256);
+            sheet.setColumnWidth(6, 40*256);
 
             ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
             workbook.write(outByteStream);
@@ -1202,6 +1210,8 @@ public class ReportsManager {
         HSSFFont font = workbook.createFont();
         HSSFCellStyle style = workbook.createCellStyle();
 
+        style.setWrapText(true);
+
         if (bold) {
             font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
             style.setFont(font);
@@ -1229,12 +1239,12 @@ public class ReportsManager {
                     IndexedColors.BLACK.getIndex());
         }
 
-        if (withBackground)
-        {
-            style.setFillBackgroundColor(HSSFColor.LIGHT_BLUE.index);
-            style.setFillPattern(HSSFCellStyle.FINE_DOTS);
-            style.setAlignment(HSSFCellStyle.ALIGN_FILL);
-        }
+//        if (withBackground)
+//        {
+//            style.setFillBackgroundColor(HSSFColor.LIGHT_BLUE.index);
+//            style.setFillPattern(HSSFCellStyle.FINE_DOTS);
+//            style.setAlignment(HSSFCellStyle.ALIGN_FILL);
+//        }
 
         return style;
     }
@@ -1381,7 +1391,7 @@ public class ReportsManager {
             aList.add(monthYear);
         }
 
-        return SortUtils.sortMonthYear(aList, ascending);
+        return SortUtils.sortMonthYear(aList,false);
     }
 
 }

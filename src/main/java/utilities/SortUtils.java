@@ -245,10 +245,15 @@ public class SortUtils {
         return dtos;
     }
 
-    public static List<SirPcrDto> sortBySirNumber(List<SirPcrDto> dtos) {
+    public static List<SirPcrDto> sortBySirNumber(List<SirPcrDto> dtos, boolean ascending) {
         DtoSirDocComparator dtoSirDocComparator = new DtoSirDocComparator();
 
         Collections.sort(dtos, dtoSirDocComparator);
+
+        if (!ascending)
+        {
+            Collections.reverse(dtos);
+        }
 
         return dtos;
     }

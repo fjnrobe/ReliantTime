@@ -447,7 +447,7 @@ public class SirPcrManager {
 
         if (sortBy != null) {
             if (sortBy == SortUtils.SortBy.SIR_NUMBER) {
-                SortUtils.sortBySirNumber(dtos);
+                SortUtils.sortBySirNumber(dtos, true);
             }
         }
 

@@ -16,6 +16,7 @@ public class InvoiceDto extends BaseDto {
     private MonthYear monthYear;
     private double hours;
     private double totalGross;
+    private double totalRecvGross;
     private Date invoiceDate;
     private Date receivedDate;
     private double priorHoursRemaining;
@@ -113,5 +114,13 @@ public class InvoiceDto extends BaseDto {
 
     public void setPoNumber(String poNumber) {
         this.poNumber = poNumber;
+    }
+
+    public double getTotalRecvGross() {
+        return totalRecvGross;
+    }
+
+    public void setTotalRecvGross(double totalRecvGross) {
+        this.totalRecvGross = totalRecvGross;
     }
 }

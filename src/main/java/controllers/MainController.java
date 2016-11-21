@@ -1112,6 +1112,8 @@ public class MainController {
                 searchDto.setYear(String.valueOf(DateTimeUtils.getCurrentYear()));
                 invoiceDtos = financialManager.getInvoicesByCriteria(searchDto);
 
+                SortUtils.sortFinancialDto(invoiceDtos, false);
+
                 root.put("yearList", years);
                 root.put("revenueList", invoiceDtos);
                 root.put("revenueSummary", summaryDtos);
@@ -1168,12 +1170,20 @@ public class MainController {
 
                     List<InvoiceDto> summaryDtos = FinancialUIHelper.createRevenueFinancialSummary(invoiceDtos);
 
+                    //create the list of years with invoices for the dropdown
+                    List <String> years = FinancialUIHelper.createYearsWithInvoices(invoiceDtos);
+
+                    FinancialSearchCriteriaDto searchDto = new FinancialSearchCriteriaDto();
+                    searchDto.setYear(String.valueOf(dto.getMonthYear().getYear()));
+
+                    invoiceDtos =financialManager.getInvoicesByCriteria(searchDto);
+                    SortUtils.sortFinancialDto(invoiceDtos, false);
+
+                    root.put("selectedYear", String.valueOf(dto.getMonthYear().getYear()));
+                    root.put("yearList", years);
                     root.put("revenueList", invoiceDtos);
                     root.put("revenueSummary", summaryDtos);
                     root.put("revenueListData",  convertToJSON(invoiceDtos));
-
-
-
 
                 }
                 root.put("errors", errors);

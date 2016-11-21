@@ -45,6 +45,12 @@ public class DateTimeUtils {
 				(targetDate.compareTo(toDate) <= 0));
 	}
 
+	public static boolean isNullDate(Date date)
+
+	{
+		return DateTimeUtils.getNullDate().compareTo(date) == 0;
+	}
+
 	public static Date getNullDate()
 	{
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -448,7 +454,8 @@ public class DateTimeUtils {
             monday.set(Calendar.DAY_OF_MONTH, monday.get(Calendar.DAY_OF_MONTH) - 1);
         }
 
-        if (monday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY )
+		if (monday.get(Calendar.DAY_OF_MONTH) < 1)
+       // if (monday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY )
         {
             monday.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -677,10 +684,14 @@ public class DateTimeUtils {
 			lastSundayOfWeek.set(Calendar.DAY_OF_MONTH, lastSundayOfWeek.get(Calendar.DAY_OF_MONTH) + 1);
 		}
 
-		if (lastSundayOfWeek.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY )
-		{
-			lastSundayOfWeek.add(Calendar.DAY_OF_MONTH, -1);
-		}
+//		int a = lastSundayOfWeek.getActualMaximum(Calendar.DAY_OF_MONTH);
+//		int b = lastSundayOfWeek.get(Calendar.DAY_OF_MONTH);
+//
+//		//if ((lastSundayOfWeek.getActualMaximum(Calendar.DAY_OF_MONTH) > lastSundayOfWeek.get(Calendar.DAY_OF_MONTH) ))
+//		if (lastSundayOfWeek.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY )
+//		{
+//			lastSundayOfWeek.add(Calendar.DAY_OF_MONTH, -1);
+//		}
 
 		return lastSundayOfWeek;
 	}
