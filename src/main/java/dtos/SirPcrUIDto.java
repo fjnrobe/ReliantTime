@@ -5,7 +5,7 @@ package dtos;
  */
 public class SirPcrUIDto {
     private SirPcrDto sirPcrDto;
-
+    private String linkParms;
     private String action;
 
 
@@ -25,4 +25,11 @@ public class SirPcrUIDto {
         this.sirPcrDto = sirPcrDto;
     }
 
+    public String getLinkParms() {
+        return linkParms;
+    }
+
+    public void setLinkParms(String linkParms) {
+        this.linkParms = linkParms;
+    }
 }

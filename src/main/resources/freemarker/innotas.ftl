@@ -42,13 +42,13 @@
                 <thead>
                   <tr>
                     <th>Description</th>
-                    <th>Mon</th>
-                    <th>Tues</th>
-                    <th>Wed</th>
-                    <th>Thur</th>
-                    <th>Fri</th>
-                    <th>Sat</th>
-                    <th>Sun</th>
+                    <th>Mon<p>${daysOfWeek[0]!""}</p></th>
+                    <th>Tues<p>${daysOfWeek[1]!""}</p></th>
+                    <th>Wed<p>${daysOfWeek[2]!""}</p></th>
+                    <th>Thur<p>${daysOfWeek[3]!""}</p></th>
+                    <th>Fri<p>${daysOfWeek[4]!""}</p></th>
+                    <th>Sat<p>${daysOfWeek[5]!""}</p></th>
+                    <th>Sun<p>${daysOfWeek[6]!""}</p></th>
                     <th>Total</th>
                   </tr>
                 </thead>
@@ -64,20 +64,20 @@
                     <#list innotasHours as row>
                         <tr>
                             <td>${row.description}</td>
-                            <td>${row.hoursPerDay[0]}</td>
-                            <td>${row.hoursPerDay[1]}</td>
-                            <td>${row.hoursPerDay[2]}</td>
-                            <td>${row.hoursPerDay[3]}</td>
-                            <td>${row.hoursPerDay[4]}</td>
-                            <td>${row.hoursPerDay[5]}</td>
-                            <td>${row.hoursPerDay[6]}</td>
-                            <td>${row.hoursPerDay[0] +
+                            <td style="text-align: right">${row.hoursPerDay[0]}</td>
+                            <td style="text-align: right">${row.hoursPerDay[1]}</td>
+                            <td style="text-align: right">${row.hoursPerDay[2]}</td>
+                            <td style="text-align: right">${row.hoursPerDay[3]}</td>
+                            <td style="text-align: right">${row.hoursPerDay[4]}</td>
+                            <td style="text-align: right">${row.hoursPerDay[5]}</td>
+                            <td style="text-align: right">${row.hoursPerDay[6]}</td>
+                            <td style="text-align: right"><b>${row.hoursPerDay[0] +
                                   row.hoursPerDay[1] +
                                   row.hoursPerDay[2] +
                                   row.hoursPerDay[3] +
                                   row.hoursPerDay[4] +
                                   row.hoursPerDay[5] +
-                                  row.hoursPerDay[6]}</td>
+                                  row.hoursPerDay[6]}</b></td>
                         </tr>
                         <#assign day0 = day0 + row.hoursPerDay[0]>
                         <#assign day1 = day1 + row.hoursPerDay[1]>
@@ -89,15 +89,15 @@
                     </#list>
                     <#assign weekTotal = day0 + day1 + day2 + day3 + day4 + day5 + day6>
                     <tr>
-                        <td>Totals</td>
-                        <td>${day0}</td>
-                        <td>${day1}</td>
-                        <td>${day2}</td>
-                        <td>${day3}</td>
-                        <td>${day4}</td>
-                        <td>${day5}</td>
-                        <td>${day6}</td>
-                        <td>${weekTotal}</td>
+                        <td style="text-align: right"><b>Totals</b></td>
+                        <td style="text-align: right"><b>${day0}</b></td>
+                        <td style="text-align: right"><b>${day1}</b></td>
+                        <td style="text-align: right"><b>${day2}</b></td>
+                        <td style="text-align: right"><b>${day3}</b></td>
+                        <td style="text-align: right"><b>${day4}</b></td>
+                        <td style="text-align: right"><b>${day5}</b></td>
+                        <td style="text-align: right"><b>${day6}</b></td>
+                        <td style="text-align: right"><b>${weekTotal}</b></td>
                     </tr>
                 </tbody>
               </table>

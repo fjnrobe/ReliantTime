@@ -44,13 +44,13 @@
               <#list errors!"">
                   <div class="panel panel-danger">
                       <div class="panel-heading">The Following Errors Occurred</div>
-                          <div class="panel-body">
-                            <#items as error>
-                                <p>${error.errorMessage}</p>
-                            </#items>
-                          </div>
+                      <div class="panel-body">
+                        <#items as error>
+                            <p>${error.errorMessage}</p>
+                        </#items>
                       </div>
                   </div>
+
               </#list>
 
               <div class="panel panel-primary">
@@ -64,9 +64,9 @@
                         <input type="hidden" id="logId" name="logId" value="${logId!""}" >
                         <input type="hidden" id="logDate" name="logDate" value="${logDate!""}" >
                         <input type="hidden" id="sirCreateDate" name="sirCreateDate" <#if sirCreateDate??>value="${sirCreateDate?datetime}"</#if>>
-                        <input type="hidden" id="sirUpdateDate" name="sirUpdateDate" <#if sirUpdateDate??>value="${sirUpdateDate?datetime}"></#if>>
-                        <input type="hidden" id="logCreateDate" name="logCreateDate" <#if logCreateDate??>value="${logCreateDate?datetime}" </#if>>
-                        <input type="hidden" id="logUpdateDate" name="logUpdateDate" <#if logUpdateDate??>value="${logUpdateDate?datetime}" </#if>>
+                        <input type="hidden" id="sirUpdateDate" name="sirUpdateDate" <#if sirUpdateDate??>value="${sirUpdateDate?datetime}"</#if>>
+                        <input type="hidden" id="logCreateDate" name="logCreateDate" <#if logCreateDate??>value="${logCreateDate?datetime}"</#if>>
+                        <input type="hidden" id="logUpdateDate" name="logUpdateDate" <#if logUpdateDate??>value="${logUpdateDate?datetime}"</#if>>
                         <div class="well">
                             <div class="form-group">
 
@@ -144,7 +144,9 @@
                                          <th>Date</th>
                                          <th>Start Time</th>
                                          <th>End Time</th>
-                                         <th>Hours</th>
+                                         <th style="text-align: right">Hours</th>
+                                         <th>Activity</th>
+                                         <th>Note</th>
                                        </tr>
                                     </thead>
                                     <tbody>
@@ -154,7 +156,9 @@
                                               <td>${row.logDate[4..5]}/${row.logDate[6..7]}/${row.logDate[0..3]}</td>
                                               <td>${row.startTime[0..1]}:${row.startTime[2..3]}</td>
                                               <td>${row.endTime[0..1]}:${row.endTime[2..3]}</td>
-                                              <td>${row.hours}</td>
+                                              <td style="text-align: right">${row.hours}</td>
+                                              <td>${row.activityDesc!""}</td>
+                                              <td>${row.note}</td>
                                           </tr>
                                       </#list>
                                     </#if>
@@ -163,6 +167,7 @@
                           </div>
                         </div>
 
+                        <input type="hidden" id="returnPageParms" name="returnPageParms" value="${returnPageParms}">
                     </form>
                   </div>
                 </div>

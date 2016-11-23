@@ -49,23 +49,23 @@
                     <tbody>
                         <tr>
                             <td></td>
-                            <td><b>Hours</b></td>
-                            <td><b>Revenue</b></td>
+                            <td style="text-align: right"><b>Hours</b></td>
+                            <td style="text-align: right"><b>Revenue</b></td>
                         </tr>
                         <tr>
                             <td><b>Billed:</b></td>
-                            <td><span id="billedHours">${summaryDto.billedHours}</span></td>
-                            <td><span id="billedGross">${summaryDto.billedGross?string.currency}</span></td>
+                            <td style="text-align: right"><span id="billedHours">${summaryDto.billedHours}</span></td>
+                            <td style="text-align: right"><span id="billedGross">${summaryDto.billedGross?string.currency}</span></td>
                         </tr>
                         <tr>
                             <td><b>Received:</b></td>
-                            <td><span id="receivedHours">${summaryDto.receivedHours}</span></td>
-                            <td><span id="receivedGross">${summaryDto.receivedGross?string.currency}</span></td>
+                            <td style="text-align: right"><span id="receivedHours">${summaryDto.receivedHours}</span></td>
+                            <td style="text-align: right"><span id="receivedGross">${summaryDto.receivedGross?string.currency}</span></td>
                         </tr>
                         <tr>
                             <td><b>Due:</b></td>
-                            <td><span id="dueHours">${summaryDto.dueHours}</span></td>
-                            <td><span id="dueGross">${summaryDto.dueGross?string.currency}</span></td>
+                            <td style="text-align: right"><span id="dueHours">${summaryDto.dueHours}</span></td>
+                            <td style="text-align: right"><span id="dueGross">${summaryDto.dueGross?string.currency}</span></td>
                         </tr>
                     </tbody>
                   </table>

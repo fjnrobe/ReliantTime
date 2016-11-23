@@ -33,7 +33,7 @@ function loadFinancialData(data)
       $("<p><b>Category</b></p>").appendTo(newCol);
       newCol = $("<td>").appendTo(newRow);
       $("<p><b>Type</b></p>").appendTo(newCol);
-      newCol = $("<td>").appendTo(newRow);
+      newCol = $("<td style='text-align: right'>").appendTo(newRow);
       $("<p><b>Amount</b></p>").appendTo(newCol);
 
       for (i = 0; i <data.expenseList.length; i++)

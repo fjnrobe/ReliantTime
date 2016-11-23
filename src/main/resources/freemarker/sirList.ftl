@@ -18,7 +18,7 @@
   <div class="panel panel-primary">
     <div class="panel-heading">Search for SIRs</div>
         <div class="panel-body">
-            <form class="form-inline" method="post" id="frmSearchSirs">
+            <form class="form-inline" method="post" id="frmSearchSirs" action="/sirList">
                 <div class="well">
                     <input type="hidden" id="action" name="action">
                     <input type="hidden" id="sirCount" name="sirCount" value="${sirCount!0}">
@@ -84,7 +84,7 @@
                                           </#if>
                                         </td>
                                         <td>${row.sirPcrDto.sirType}</td>
-                                        <td><a href="/sirDetail/${row.sirPcrDto.id}">${row.sirPcrDto.sirPcrNumber}</a></td>
+                                        <td><a href="/sirDetail/${row.sirPcrDto.id}/${row.linkParms}">${row.sirPcrDto.sirPcrNumber}</a></td>
                                         <td>${row.sirPcrDto.nickName!""}</td>
                                         <td>${row.sirPcrDto.sirDesc[0..*30]!""}</td>
                                         <td>${row.sirPcrDto.completedInd?c}</td>

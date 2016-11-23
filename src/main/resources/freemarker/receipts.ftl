@@ -65,8 +65,8 @@
                                     <td>${row.monthYear.sortKey}</td>
                                     <td>${row.poNumber}</td>
                                     <td>${row.invoiceNumber}</td>
-                                    <td>${row.hours}</td>
-                                     <td>${row.totalGross?string.currency}</td>
+                                    <td style="text-align: right">${row.hours}</td>
+                                     <td style="text-align: right">${row.totalGross?string.currency}</td>
 
                                     <td>${row.invoiceDate?date}</td>
                                     <td>${row.receivedDate?date}</td>
@@ -99,8 +99,8 @@
                                  <thead>
                                    <tr>
                                      <th>Year</th>
-                                     <th>Gross Revenue</th>
-                                     <th>Received Revenue</th>
+                                     <th style="text-align: right">Gross Revenue</th>
+                                     <th style="text-align: right">Received Revenue</th>
 
                                    </tr>
                                  </thead>

@@ -175,7 +175,7 @@
                                 <#list matrixConfig as sir>
 
                                     <tr>
-                                        <td><a href="/sirDetail/${sir.id}">${sir.sirNickname!"" }</a></td>
+                                        <td><a href="/sirDetail/${sir.id}/${sir.linkParms}">${sir.sirNickname!"" }</a></td>
 
                                         <#list sir.spaceBeforeEntry as nextLogSpace>
                                             <#if nextLogSpace gt 0>

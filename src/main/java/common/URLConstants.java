@@ -18,7 +18,7 @@ public class URLConstants
         public static final String NEW_SIR = "/newSir/:date";
         public static final String NEW_LOG = "/newLog";
         public static final String SAVE_SIR = "/saveSir";
-        public static final String SIR_DETAIL = "/sirDetail/:sirId";
+        public static final String SIR_DETAIL = "/sirDetail/:sirId/:returnPageParms";
         public static final String UPDATE_SIR = "/updateSir";
         public static final String EDIT_LOG = "/editLog/:logId";
         public static final String GET_SIR_AND_LOGS = "/sirGet/:sirId";

@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="ReliantTime:jar">
+  <artifact type="jar" name="ReliantTime:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/ReliantTime_jar</output-path>
     <root id="archive" name="ReliantTime_jar.jar">
       <element id="archive" name="ReliantTime.jar">

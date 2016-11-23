@@ -24,6 +24,7 @@ public class InnotasRowUiDto {
 
     private String description;
     private double[] hoursPerDay = new double[7];
+    private String[] dayOfMonth = new String[7];
 
     public String getLogDate() {
         return logDate;
@@ -34,4 +35,12 @@ public class InnotasRowUiDto {
     }
 
     private String logDate;
+
+    public String[] getDayOfMonth() {
+        return dayOfMonth;
+    }
+
+    public void setDayOfMonth(String[] dayOfMonth) {
+        this.dayOfMonth = dayOfMonth;
+    }
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class DayEntryMatrixRowuiDto {
     private ObjectId id;
     private String sirNickname;
+    private String linkParms;
 
 
     private ArrayList<ObjectId> logId;
@@ -48,7 +49,13 @@ public class DayEntryMatrixRowuiDto {
         this.entryLabel = entryLabel;
     }
 
+    public String getLinkParms() {
+        return linkParms;
+    }
 
+    public void setLinkParms(String linkParms) {
+        this.linkParms = linkParms;
+    }
 
     public ObjectId getId() {
         return id;

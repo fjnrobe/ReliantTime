@@ -498,6 +498,13 @@ public class DateTimeUtils {
 		return today.get(Calendar.DAY_OF_MONTH);
 	}
 
+	public static int getDayOfMonth(Date date)
+	{
+		GregorianCalendar today = new GregorianCalendar();
+		today.setTime(date);
+		return today.get(Calendar.DAY_OF_MONTH);
+	}
+
 	public Date getFirstDayOfMonth(MonthYear monthYear)
 	{
 		Calendar startDate = Calendar.getInstance();
@@ -644,7 +651,16 @@ public class DateTimeUtils {
 //		return SortUtils.sortYear(years, ascending);
 //	}
 
-	
+	public static String getNextDay(String dateAsYYYYMMDD)
+	{
+		Date date = DateTimeUtils.stringToDate(dateAsYYYYMMDD, DateFormats.YYYYMMDD);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_MONTH, 1);
+
+		return DateTimeUtils.DateToString(cal, DateFormats.YYYYMMDD, false);
+	}
+
 	public static Calendar getLastFridayOfWeek(Calendar date )
 	{
 		//set the completion week to the current month, and then set the last day to the month

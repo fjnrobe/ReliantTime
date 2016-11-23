@@ -5,13 +5,11 @@ import common.FieldConstants;
 import dtos.LogDto;
 import dtos.SirPcrDto;
 import dtos.SirPcrUIDto;
+import dtos.UrlParametersDto;
 import managers.SirPcrManager;
 import org.bson.types.ObjectId;
 import spark.Request;
-import utilities.DateTimeUtils;
-import utilities.NumberUtils;
-import utilities.SortUtils;
-import utilities.StringUtils;
+import utilities.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -126,7 +124,9 @@ public class SIRUIHelper {
         return root;
     }
 
-    public static HashMap<String, Object> mapSirPcrDtoToUiDto(List<SirPcrDto> dtos)
+    public static HashMap<String, Object> mapSirPcrDtoToUiDto(String fromPage,
+                                                              Request request,
+                                                              List<SirPcrDto> dtos)
     {
         HashMap<String, Object> root = new HashMap<String, Object>();
 
@@ -138,6 +138,22 @@ public class SIRUIHelper {
         {
             SirPcrUIDto uiDto = new SirPcrUIDto();
             uiDto.setSirPcrDto(dto);
+
+            HashMap<String, String> pageParms = new HashMap<String, String>();
+            pageParms.put("sirStatus", request.queryParams("sirStatus"));
+            pageParms.put("sirType", request.queryParams("sirType"));
+            pageParms.put("sirNumber", request.queryParams("sirNumber"));
+
+            UrlParametersDto parmDto = new UrlParametersDto();
+            parmDto.setPriorPage(fromPage);
+            parmDto.setPageParms(pageParms);
+
+            try {
+                uiDto.setLinkParms(UrlEncoder.cipher(parmDto.toJSON()));
+            } catch (Exception e)
+            {
+                uiDto.setLinkParms("");
+            }
             uiDto.setAction("");
 
             results.add(uiDto);

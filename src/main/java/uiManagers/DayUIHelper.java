@@ -1,10 +1,13 @@
 package uiManagers;
 
 import common.LogTime;
+import common.URLConstants;
 import dtos.DayEntryMatrixRowuiDto;
 import dtos.LogDto;
 import dtos.SirPcrDto;
+import dtos.UrlParametersDto;
 import utilities.DateTimeUtils;
+import utilities.UrlEncoder;
 
 import java.util.*;
 
@@ -28,6 +31,13 @@ public class DayUIHelper {
         calendar.add(Calendar.DATE, -2);
         parms.put("prevDay", DateTimeUtils.DateToString(calendar.getTime(), DateTimeUtils.DateFormats.YYYYMMDD, false));
 
+        UrlParametersDto parmDto = new UrlParametersDto();
+        parmDto.setPriorPage(URLConstants.DAY_ENTRY_NO_DATE);
+        HashMap<String, String> pageParms = new HashMap<String, String>();
+        pageParms.put("date", dayToShow);
+
+        parmDto.setPageParms(pageParms);
+
         List<DayEntryMatrixRowuiDto> dayEntries = new ArrayList<DayEntryMatrixRowuiDto>();
 
         double totHours = 0.0;
@@ -39,6 +49,7 @@ public class DayUIHelper {
             DayEntryMatrixRowuiDto uiDto = new DayEntryMatrixRowuiDto();
             uiDto.setSirNickname(sirEntry.getNickName());
             uiDto.setId(sirEntry.getId());
+            uiDto.setLinkParms(UrlEncoder.cipher(parmDto.toJSON()));
 
             //for each sir, we will denote the log entry for a given start/end time with a button'
             for (LogDto logEntry : sirEntry.getLogs()) {

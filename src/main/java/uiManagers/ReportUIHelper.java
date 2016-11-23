@@ -31,7 +31,9 @@ public class ReportUIHelper {
                 for (int x = 0; x <= 6; x++)
                 {
                     newRow.getHoursPerDay()[x] = 0;
+
                 }
+
                 matrix.put(entry.getPrimaveraDesc(), newRow);
             }
             InnotasRowUiDto dto = matrix.get(entry.getPrimaveraDesc());

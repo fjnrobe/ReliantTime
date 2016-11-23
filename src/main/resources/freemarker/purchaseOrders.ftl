@@ -129,41 +129,41 @@
                             <thead>
                                <tr>
                                  <th></th>
-                                 <th>Hours</th>
-                                 <th>Gross</th>
-                                 <th>Passthru</th>
-                                 <th>Adjusted Gross</th>
+                                 <th style="text-align: right">Hours</th>
+                                 <th style="text-align: right">Gross</th>
+                                 <th style="text-align: right">Passthru</th>
+                                 <th style="text-align: right">Adjusted Gross</th>
                                </tr>
                             </thead>
 
                             <tbody>
                                 <tr>
                                     <td><b>Total</b></td>
-                                    <td><span id="totalHours">${totalHours!0.0}</span></td>
-                                    <td><span id="totalGross">${totalGross?string.currency}</span></td>
-                                    <td><span id="totalPassthru">${totalPassthru?string.currency}</span></td>
-                                    <td><span id="totalAdjustedGross">${totalAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="totalHours">${totalHours!0.0}</span></td>
+                                    <td style="text-align: right"><span id="totalGross">${totalGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="totalPassthru">${totalPassthru?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="totalAdjustedGross">${totalAdjustedGross?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Billed</b></td>
-                                    <td><span id="billedHours">${billedHours!0.0}</span></td>
-                                    <td><span id="billedGross">${billedGross?string.currency}</span></td>
-                                    <td><span id="billedPassthru">${billedPassthru?string.currency}</span></td>
-                                    <td><span id="billedAdjustedGross">${billedAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="billedHours">${billedHours!0.0}</span></td>
+                                    <td style="text-align: right"><span id="billedGross">${billedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="billedPassthru">${billedPassthru?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="billedAdjustedGross">${billedAdjustedGross?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Due</b></td>
-                                    <td><span id="dueHours">${dueHours!0.0}</span></td>
-                                    <td><span id="dueGross">${dueGross?string.currency}</span></td>
-                                    <td><span id="duePassthru">${duePassthru?string.currency}</span></td>
-                                    <td><span id="dueAdjustedGross">${dueAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="dueHours">${dueHours!0.0}</span></td>
+                                    <td style="text-align: right"><span id="dueGross">${dueGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="duePassthru">${duePassthru?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="dueAdjustedGross">${dueAdjustedGross?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Remaining</b></td>
-                                    <td><span id="remHours">${remHours!0.0}</span></td>
-                                    <td><span id="remGross">${remGross?string.currency}</span></td>
-                                    <td><span id="remPassthru">${remPassthru?string.currency}</span></td>
-                                    <td><span id="remAdjustedGross">${remAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="remHours">${remHours!0.0}</span></td>
+                                    <td style="text-align: right"><span id="remGross">${remGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="remPassthru">${remPassthru?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="remAdjustedGross">${remAdjustedGross?string.currency}</span></td>
                                 </tr>
 
                             </tbody>
@@ -182,12 +182,12 @@
                                  <tr>
                                    <th>Invoice #</th>
                                    <th>Month/Year</th>
-                                   <th>Start Hrs</th>
-                                   <th>Start Amt</th>
-                                   <th>Billed Hrs</th>
-                                   <th>Billed Amt</th>
-                                   <th>Rem Hrs</th>
-                                   <th>Rem Amt</th>
+                                   <th style="text-align: right">Start Hrs</th>
+                                   <th style="text-align: right">Start Amt</th>
+                                   <th style="text-align: right">Billed Hrs</th>
+                                   <th style="text-align: right">Billed Amt</th>
+                                   <th style="text-align: right">Rem Hrs</th>
+                                   <th style="text-align: right">Rem Amt</th>
                                  </tr>
                               </thead>
 
@@ -198,12 +198,12 @@
                                         <tr>
                                           <td>${row.invoiceNumber!""}</td>
                                           <td>${row.monthYearAsString!""}</td>
-                                          <td>${row.priorHoursRemaining}</td>
-                                          <td>${row.priorAmtRemaining?string.currency}</td>
-                                          <td>${row.hours!0.0}</td>
-                                          <td>${row.totalGross?string.currency}</td>
-                                          <td>${row.hoursRemaining!0.0}</td>
-                                          <td>${row.amtRemaining?string.currency}</td>
+                                          <td style="text-align: right">${row.priorHoursRemaining}</td>
+                                          <td style="text-align: right">${row.priorAmtRemaining?string.currency}</td>
+                                          <td style="text-align: right">${row.hours!0.0}</td>
+                                          <td style="text-align: right">${row.totalGross?string.currency}</td>
+                                          <td style="text-align: right">${row.hoursRemaining!0.0}</td>
+                                          <td style="text-align: right">${row.amtRemaining?string.currency}</td>
                                         </tr>
                                     </#list>
                                  </#if>

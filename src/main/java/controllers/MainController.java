@@ -16,17 +16,15 @@ import org.bson.types.ObjectId;
 import spark.*;
 import uiManagers.*;
 import utilities.DateTimeUtils;
+import utilities.JSONUtils;
 import utilities.SortUtils;
+import utilities.UrlEncoder;
 
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 import static spark.Spark.*;
@@ -245,7 +243,7 @@ public class MainController {
                 List<CalendarDto> data = logManager.getCalendarHoursByMonth(yearMonth);
 
 
-                return convertToJSON(data);
+                return JSONUtils.convertToJSON(data);
             }
         });
 
@@ -270,7 +268,7 @@ public class MainController {
                     returnData.add(dto);
                 }
 
-                return convertToJSON(returnData);
+                return JSONUtils.convertToJSON(returnData);
             }
         });
 
@@ -298,7 +296,14 @@ public class MainController {
             public void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException{
 
-                String today = DateTimeUtils.getTodayAsString(DateTimeUtils.DateFormats.YYYYMMDD, false);
+                String today = "";
+                if (request.queryParams("date") == null) {
+                    today = DateTimeUtils.getTodayAsString(DateTimeUtils.DateFormats.YYYYMMDD, false);
+                }
+                else
+                {
+                    today = request.queryParams("date");
+                }
 
                 HashMap<String, Object> root = sirPcrManager.getDayEntryMatrix(today);
 
@@ -329,7 +334,7 @@ public class MainController {
                 }
 
                 List<ExistingSIRUIDto> data = sirPcrManager.getExistingSirs(status);
-                return convertToJSON(data);
+                return JSONUtils.convertToJSON(data);
 
             }
         });
@@ -341,7 +346,7 @@ public class MainController {
             public Object handle(Request request, Response response) {
 
                 SirPcrDto sirPcrDto = sirPcrManager.getSirAndLogsBySirId(request.params(":sirId"));
-                return convertToJSON(sirPcrDto);
+                return JSONUtils.convertToJSON(sirPcrDto);
 
             }
         });
@@ -517,7 +522,7 @@ public class MainController {
                 String lovCode = request.params(":lovCode");
                 List<LovBaseDto> lovList = lovManager.getLovEntries(LOVEnum.fromString(lovCode));
 
-                return convertToJSON(TablesUIHelper.createLovCodeUiDtos(lovList, lovManager));
+                return JSONUtils.convertToJSON(TablesUIHelper.createLovCodeUiDtos(lovList, lovManager));
             }
 
         });
@@ -619,6 +624,32 @@ public class MainController {
                 List<InnotasRowUiDto> uiDtos =
                         ReportUIHelper.createInnotasReportMatrix(dtos);
 
+                String[] daysOfWeek = new String[7];
+                String startOfWeek = DateTimeUtils.getFirstDayOfWeek(startDate);
+                String endDate = DateTimeUtils.getLastDayOfWeek(startOfWeek);
+                //what day of the week does our week start (usually a Monday, but if at the
+                //first week of the month, the first day of the week could be thursday or friday
+                //the week starts on a Sunday - but for Innotas - start on Monday
+                int startDayIdx = DateTimeUtils.getDayOfWeek(startOfWeek);
+                startDayIdx -= 2;
+                if (startDayIdx < 0)
+                {
+                    startDayIdx = 6;
+                }
+                daysOfWeek[startDayIdx] = startOfWeek.substring(4,6) + "/" +
+                                          startOfWeek.substring(6) + "/" +
+                                          startOfWeek.substring(0,4);
+
+                String nextDay = startOfWeek;
+                for (int x = startDayIdx + 1; x <= 6; x++)
+                {
+                    nextDay = DateTimeUtils.getNextDay(nextDay);
+                    daysOfWeek[x] = nextDay.substring(4,6) + "/" +
+                            nextDay.substring(6) + "/" +
+                            nextDay.substring(0,4);
+                }
+
+                root.put("daysOfWeek", daysOfWeek);
                 root.put("date", startDate);
                 root.put("innotasHours", uiDtos);
 
@@ -729,6 +760,18 @@ public class MainController {
 
                 HashMap<String, Object> root = new HashMap<String, Object>();
 
+                //if the page has incoming parameters, then load then
+                if (request.queryParams("sirStatus") != null) {
+                    root.putAll(SIRUIHelper.mapSirPcrDtoToUiDto(URLConstants.MAINT_SIR_LIST,
+                            request,
+                            sirPcrManager.findSirsByCriteria(request.queryParams("sirStatus"),
+                                    request.queryParams("sirType"),
+                                    request.queryParams("sirNumber"))));
+
+                    root.put("sirStatus", request.queryParams("sirStatus"));
+                    root.put("sirType", request.queryParams("sirType"));
+                    root.put("sirNumber", request.queryParams("sirNumber"));
+                }
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
             }
@@ -751,10 +794,11 @@ public class MainController {
 
                 if (request.queryParams("action").equals("SEARCH"))
                 {
-                    root.putAll(SIRUIHelper.mapSirPcrDtoToUiDto(
-                            sirPcrManager.findSirsByCriteria(request.queryParams("sirStatus"),
-                                                             request.queryParams("sirType"),
-                                                             request.queryParams("sirNumber"))));
+                    root.putAll(SIRUIHelper.mapSirPcrDtoToUiDto(URLConstants.MAINT_SIR_LIST,
+                                                            request,
+                                                sirPcrManager.findSirsByCriteria(request.queryParams("sirStatus"),
+                                                 request.queryParams("sirType"),
+                                                 request.queryParams("sirNumber"))));
                 }
                 else
                 {
@@ -765,7 +809,8 @@ public class MainController {
                     sirPcrManager.closeSirs(results);
 
                     //after closing the sirs, requery using the current search criteria
-                    root.putAll(SIRUIHelper.mapSirPcrDtoToUiDto(
+                    root.putAll(SIRUIHelper.mapSirPcrDtoToUiDto(URLConstants.MAINT_SIR_LIST,
+                            request,
                             sirPcrManager.findSirsByCriteria(request.queryParams("sirStatus"),
                                     request.queryParams("sirType"),
                                     request.queryParams("sirNumber"))));
@@ -790,7 +835,7 @@ public class MainController {
                 String lovCode = request.params(":lovCode");
                 List<LovBaseDto> lovList = lovManager.getLovEntries(LOVEnum.fromString(lovCode));
 
-                return convertToJSON(TablesUIHelper.createLovCodeUiDtos(lovList, lovManager));
+                return JSONUtils.convertToJSON(TablesUIHelper.createLovCodeUiDtos(lovList, lovManager));
             }
 
         });
@@ -804,6 +849,8 @@ public class MainController {
                 HashMap<String, Object> root = new HashMap<String, Object>();
 
                 String sirId = request.params(":sirId");
+                String returnPageParms = request.params(":returnPageParms");
+
                 SirPcrDto sirPcrDto = sirPcrManager.getSirAndLogsBySirId(sirId);
 
                 root.putAll(SIRUIHelper.mapSirToQueryParams(sirPcrDto));
@@ -811,7 +858,7 @@ public class MainController {
                 List<LovBaseDto> subProcessTypes = lovManager.getLovEntries(LOVEnum.SUB_PROCESS_TYPE);
 
                 root.put("subProcessTypes", subProcessTypes);
-
+                root.put("returnPageParms", returnPageParms);
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
             }
@@ -827,11 +874,49 @@ public class MainController {
                 //pull the queryParms from request - map to an object and then invoke manager
 
                 SirPcrDto sir = SIRUIHelper.mapSirFromQueryParms(request, sirPcrManager, false);
+                String returnPageParms = request.queryParams("returnPageParms");
+
                 List<ErrorDto> errors = sirPcrManager.validateAndSaveSir(sir);
                 if (errors.isEmpty())
                 {
+                    String nextPageParms = "";
 
-                    response.redirect("/sirList");
+                    if (returnPageParms != null) {
+                        UrlParametersDto parmDto = null;
+
+                        try {
+
+                            String parms = UrlEncoder.decipher(returnPageParms);
+
+                            parmDto = JSONUtils.convertUrlParameterDtoToObject(parms);
+
+                            Iterator iterator = parmDto.getPageParms().entrySet().iterator();
+                            int parmIdx = 0;
+                            while (iterator.hasNext())
+                            {
+                                Map.Entry pair = (Map.Entry)iterator.next();
+
+                                if (parmIdx == 0) {
+                                    nextPageParms = "?" + pair.getKey() + "=" + pair.getValue();
+                                } else {
+                                    nextPageParms += "&" +pair.getKey() + "=" + pair.getValue();
+                                }
+
+                                parmIdx++;
+                            }
+
+                            nextPageParms = parmDto.getPriorPage() + nextPageParms;
+
+                        } catch (Exception e) {
+
+                        }
+
+                    }
+                    else
+                    {
+                        nextPageParms = URLConstants.MAINT_SIR_LIST;
+                    }
+                    response.redirect(nextPageParms);
                 }
                 else
                 {
@@ -899,7 +984,7 @@ public class MainController {
 
                 root.put("deductionList", uiDtos);
                 root.put("deductionSummary", summaryDtos);
-                root.put("deductionListData",  convertToJSON(uiDtos));
+                root.put("deductionListData",  JSONUtils.convertToJSON(uiDtos));
                 root.put("deductionCategoryList", deductionCatgList);
                 root.put("deductionTypeList", deductionTypeList);
                 root.put("defaultCategoryCode", deductionCategory);
@@ -946,7 +1031,7 @@ public class MainController {
 
                     root.put("deductionList", uiDtos);
                     root.put("deductionSummary", summaryDtos);
-                    root.put("deductionListData", convertToJSON(uiDtos));
+                    root.put("deductionListData", JSONUtils.convertToJSON(uiDtos));
                     root.put("deductionCategoryList", deductionCatgList);
                     root.put("deductionTypeList", deductionTypeList);
                     root.put("defaultCategoryCode", dto.getDeductionCategory());
@@ -989,7 +1074,7 @@ public class MainController {
 
                 root.put("deductionList", uiDtos);
                 root.put("deductionSummary", summaryDtos);
-                root.put("deductionListData", convertToJSON(uiDtos));
+                root.put("deductionListData", JSONUtils.convertToJSON(uiDtos));
                 root.put("deductionCategoryList", deductionCatgList);
                 root.put("deductionTypeList", deductionTypeList);
                 root.put("defaultCategoryCode", origDto.getDeductionCategory());
@@ -1014,7 +1099,7 @@ public class MainController {
                 List<LovBaseDto> typeDtos =
                         lovManager.getLovEntriesByDeductionCode(deductionCategory);
 
-                return convertToJSON(typeDtos);
+                return JSONUtils.convertToJSON(typeDtos);
             }
 
         });
@@ -1117,7 +1202,7 @@ public class MainController {
                 root.put("yearList", years);
                 root.put("revenueList", invoiceDtos);
                 root.put("revenueSummary", summaryDtos);
-                root.put("revenueListData",  convertToJSON(invoiceDtos));
+                root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
 
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
@@ -1133,7 +1218,7 @@ public class MainController {
                 FinancialSearchCriteriaDto searchDto = new FinancialSearchCriteriaDto();
                 searchDto.setYear(year);
 
-                return convertToJSON(financialManager.getInvoicesByCriteria(searchDto));
+                return JSONUtils.convertToJSON(financialManager.getInvoicesByCriteria(searchDto));
             }
         });
 
@@ -1143,7 +1228,7 @@ public class MainController {
             public Object handle(Request request, Response response) {
 
                 InvoiceDto dto = financialManager.getNextInvoice(DateTimeUtils.getLastMonthYear(new Date()));
-                String json = convertToJSON(dto);
+                String json = JSONUtils.convertToJSON(dto);
                 return json;
             }
         });
@@ -1183,7 +1268,7 @@ public class MainController {
                     root.put("yearList", years);
                     root.put("revenueList", invoiceDtos);
                     root.put("revenueSummary", summaryDtos);
-                    root.put("revenueListData",  convertToJSON(invoiceDtos));
+                    root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
 
                 }
                 root.put("errors", errors);
@@ -1211,7 +1296,7 @@ public class MainController {
 
                 root.put("revenueList", invoiceDtos);
                 root.put("revenueSummary", summaryDtos);
-                root.put("revenueListData",  convertToJSON(invoiceDtos));
+                root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
 
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
@@ -1267,7 +1352,7 @@ public class MainController {
                                 null,
                                 null, null);
 
-                return convertToJSON(FinancialUIHelper.createFinancialSummary(lovManager,
+                return JSONUtils.convertToJSON(FinancialUIHelper.createFinancialSummary(lovManager,
                                                                               year,
                         invoiceDtos,
                                                                               deductionDtos));
@@ -1340,22 +1425,6 @@ public class MainController {
         });
     }
 
-    public String convertToJSON(Object object) {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = null;
-        try {
-            json = mapper.writeValueAsString(object);
 
-
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return json;
-    }
 
 }
