@@ -34,6 +34,8 @@ public class URLConstants
         public static final String REPORT_MONTHLY_STATUS_XLS = "/reports/monthlyStatus/:yearMonth";
         public static final String REPORT_MONTHLY_INVOICE_XLS = "/reports/invoice/:invoiceNumber";
         public static final String REPORT_MONTHLY_TIMESHEET_XLS = "/reports/timesheet/:yearMonth";
+        public static final String REPORT_MONTHLY_INVOICE_GETFILE = "/reports/monthlyStatus/getFile/:fileName";
+        public static final String REPORT_MONTHLY_INVOICE_EMAILFILE = "/reports/monthlyStatus/emailFile";
 
         public static final String MAINT_SIR_LIST ="/sirList";
         public static final String DEDUCTIONS = "/deductions";

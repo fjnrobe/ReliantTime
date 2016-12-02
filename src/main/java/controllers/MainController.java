@@ -21,6 +21,7 @@ import utilities.SortUtils;
 import utilities.UrlEncoder;
 
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -41,6 +42,7 @@ public class MainController {
     private final DeductionManager deductionManager;
     private final UserManager userManager;
     private final FinancialManager financialManager;
+    private final EmailManager emailManager;
 
     public static void main (String[] args) throws IOException {
 
@@ -59,6 +61,7 @@ public class MainController {
         this.deductionManager = new DeductionManager(reliantDb);
         this.userManager = new UserManager(reliantDb);
         this.financialManager = new FinancialManager(reliantDb);
+        this.emailManager = new EmailManager(reliantDb);
 
         //inject other managers
         this.lovManager.setLogManager(this.logManager);
@@ -667,10 +670,69 @@ public class MainController {
                 List<MonthYear> aList = reportManager.getAllMonthsWithLoggedPeriods(true);
                 root.put("monthYears", aList);
 
+                List<FileNameDto> fileList = reportManager.getStatusFileList();
+                root.put("fileList", fileList);
+
+                root.put("toAddresses", emailManager.getToEmailAddresses());
+
                 template.process(root, writer);
             }
 
         });
+
+
+        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_INVOICE_EMAILFILE,
+                TemplateConstants.MONTHLY_STATUS) {
+            @Override
+            public void doHandle(Request request, Response response, Writer writer)
+                    throws IOException, TemplateException {
+
+                String fileName = request.queryParams("emailFileName");
+                String toAddress = request.queryParams("toEmail");
+                String subjectText = request.queryParams("subjectText");
+                String bodyText = request.queryParams("bodyText");
+
+                emailManager.sendEmail(toAddress, subjectText, bodyText, fileName);
+
+                HashMap<String, Object> root = new HashMap<String, Object>();
+                List<MonthYear> aList = reportManager.getAllMonthsWithLoggedPeriods(true);
+                root.put("monthYears", aList);
+
+                List<FileNameDto> fileList = reportManager.getStatusFileList();
+                root.put("fileList", fileList);
+
+                root.put("toAddresses", emailManager.getToEmailAddresses());
+
+                template.process(root, writer);
+
+            }
+        });
+
+//        //REST call
+//        //invoked from the calendar page to get the days/hours in the incoming month/year
+//        get(new Route(URLConstants.REPORT_MONTHLY_STATUS_XLS) {
+//            @Override
+//            public Object handle(Request request, Response response) {
+//                MonthYear yearMonth = new MonthYear(request.params(":yearMonth"));
+//
+//                response.type("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//                response.header("Content-Disposition", "attachment; filename=filename.xls");
+//
+//                byte[] xls = reportManager.createMonthlyStatus(yearMonth);
+//
+//                try {
+//
+//                    response.raw().getOutputStream().write(xls);
+//                    response.raw().flushBuffer();
+//
+//                } catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
+//
+//                return null;
+//            }
+//        });
 
 
         //REST call
@@ -680,10 +742,33 @@ public class MainController {
             public Object handle(Request request, Response response) {
                 MonthYear yearMonth = new MonthYear(request.params(":yearMonth"));
 
+                String fileName = reportManager.writeMonthlyStatus(yearMonth);
+
+                try {
+
+                    response.raw().getWriter().println(fileName);
+                    response.raw().flushBuffer();
+
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        });
+
+        //REST call
+        //invoked from the calendar page to get the days/hours in the incoming month/year
+        get(new Route(URLConstants.REPORT_MONTHLY_INVOICE_GETFILE) {
+            @Override
+            public Object handle(Request request, Response response) {
+               String fileName = request.params(":fileName");
+
                 response.type("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                 response.header("Content-Disposition", "attachment; filename=filename.xls");
 
-                byte[] xls = reportManager.createMonthlyStatus(yearMonth);
+                byte[] xls = reportManager.getMonthlyStatus(fileName);
 
                 try {
 

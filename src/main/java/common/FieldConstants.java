@@ -91,4 +91,13 @@ public class FieldConstants {
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
 
+    //fields for the Email Properties
+    public static final String SMTP_AUTH = "smtpAuth";
+    public static final String SMTP_PORT = "smtpPort";
+    public static final String SMTP_HOST = "smtpHost";
+    public static final String SOURCE_EMAIL = "sourceEmail";
+    public static final String SOURCE_PERSONAL = "sourcePersonal";
+    public static final String SOURCE_PASSWORD = "sourcePassword";
+    public static final String TO_EMAILS = "toEmailAddresses";
+
 }

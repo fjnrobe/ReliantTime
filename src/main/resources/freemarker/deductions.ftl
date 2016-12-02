@@ -11,7 +11,7 @@
 </head>
 <body>
 
- <#include "/header.ftl">
+ <#include "/header.ftl"/>
  <div class="container-fluid">
 
     <div class="panel-group">

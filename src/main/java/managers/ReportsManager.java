@@ -2,6 +2,7 @@ package managers;
 
 import com.mongodb.client.MongoDatabase;
 import common.MonthYear;
+import common.SystemConstants;
 import daos.InvoiceDao;
 import daos.LogDao;
 import daos.PurchaseOrderDao;
@@ -600,13 +601,6 @@ public class ReportsManager {
         int colIdx = 0;
         String line = "";
 
-
-//        HSSFCellStyle styleCurrencyFormat = workbook.createCellStyle();
-//        styleCurrencyFormat.setDataFormat((short)8);
-//
-//        HSSFCellStyle styleNumberFormat = workbook.createCellStyle();
-//        styleNumberFormat.setDataFormat((short) 4);
-
         HSSFCellStyle borderCell = this.createBorderStyle(workbook, null, HSSFCellStyle.BORDER_THIN,
                 HSSFCellStyle.BORDER_THIN, HSSFCellStyle.BORDER_THIN, HSSFCellStyle.BORDER_THIN);
         borderCell.setAlignment(HSSFCellStyle.ALIGN_CENTER);
@@ -949,9 +943,94 @@ public class ReportsManager {
         return SortUtils.sortHoursCalendarByWeekAndDay(timesheetDtos);
     }
 
-    public byte [] createMonthlyStatus(MonthYear monthYear)
+    public String writeMonthlyStatus(MonthYear monthYear)
+    {
+        String fileName = "c:\\ReliantTime\\files\\Monthly_Status_" + monthYear.getMonthName() + "_" + monthYear.getYearName() + ".xls";
+
+        try {
+            HSSFWorkbook workbook = this.createMonthlyStatus(monthYear);
+
+            FileOutputStream outputStream = new FileOutputStream(fileName);
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.close();
+
+        } catch (Exception e)
+        {
+            fileName = null;
+        }
+
+        return fileName;
+    }
+
+    public byte [] getMonthlyStatus(MonthYear monthYear)
     {
         byte [] outArray = new byte[0];
+        ByteArrayOutputStream outByteStream = null;
+
+        try {
+            HSSFWorkbook workbook = this.createMonthlyStatus(monthYear);
+
+            outByteStream = new ByteArrayOutputStream();
+
+            workbook.write(outByteStream);
+            workbook.close();
+        } catch (Exception e)
+        {
+
+        }
+
+        if (outByteStream != null)
+        {
+            outArray = outByteStream.toByteArray();
+        }
+
+        return outArray;
+
+    }
+
+    public byte [] getMonthlyStatus(String fileName)
+    {
+        byte [] outArray = new byte[8192];
+        ByteArrayOutputStream outByteStream = null;
+
+        Properties props = SystemManager.loadProperties();
+
+        try {
+
+            File f = new File(props.getProperty(SystemConstants.FILE_DIRECTORY) + "/" + fileName);
+
+            outByteStream = new ByteArrayOutputStream();
+
+            InputStream is = new FileInputStream(f);
+
+            int c = 0;
+
+            while ((c = is.read(outArray, 0, outArray.length)) > 0) {
+                outByteStream.write(outArray, 0, c);
+                outByteStream.flush();
+            }
+
+            outByteStream.close();
+
+            is.close();
+
+        } catch (Exception e)
+        {
+
+        }
+
+        if (outByteStream != null)
+        {
+            outArray = outByteStream.toByteArray();
+        }
+
+        return outArray;
+
+    }
+
+    private HSSFWorkbook createMonthlyStatus(MonthYear monthYear)
+    {
 
         HSSFWorkbook workbook = new HSSFWorkbook();
 
@@ -1089,7 +1168,7 @@ public class ReportsManager {
                     {
 
                         //if the sir is currently done, set the completion date to the friday of the week it was completed
-                        if (data.getSirPcrViewDto().getSirPcrDto().getCompletedInd() == false)
+                        if (data.getSirPcrViewDto().getSirPcrDto().getCompletedInd() == true)
                         {
                             statusDesc = "Done";
                             //set the completion day to the friday in the week that the activity finished
@@ -1175,16 +1254,18 @@ public class ReportsManager {
             sheet.setColumnWidth(5, 17*256);
             sheet.setColumnWidth(6, 40*256);
 
-            ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-            workbook.write(outByteStream);
-            workbook.close();
-            outArray = outByteStream.toByteArray();
+//            ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+//            OutputStreamWriter out = new OutputStreamWriter()
+//
+//            workbook.write(outByteStream);
+//            workbook.close();
+//            outArray = outByteStream.toByteArray();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-       return outArray;
+       return workbook;
     }
 
     private HSSFCellStyle createBorderStyle(HSSFWorkbook workbook,
@@ -1395,4 +1476,36 @@ public class ReportsManager {
         return SortUtils.sortMonthYear(aList,false);
     }
 
+    /**
+     * return a list of the files with a *Monthly_Status* name in the
+     * @return
+     */
+    public List<FileNameDto> getStatusFileList()
+    {
+        List<FileNameDto> fileNames = new ArrayList<FileNameDto>();
+
+        Properties props = SystemManager.loadProperties();
+
+        String fileFolder = props.getProperty(SystemConstants.FILE_DIRECTORY);
+        String statusFilePattern = props.getProperty(SystemConstants.STATUS_FILE_NAME_PATTERN);
+
+        File folder = new File(fileFolder);
+        File[] listOfFiles = folder.listFiles();
+
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                //see if the file matches the pattern for status reports
+                if (file.getName().startsWith(statusFilePattern))
+                {
+                    FileNameDto fileNameDto = new FileNameDto();
+                    fileNameDto.setFileName(file.getName());
+                    fileNameDto.setFileNameWithPath(file.getPath());
+
+                    fileNames.add(fileNameDto);
+                }
+            }
+        }
+
+        return fileNames;
+    }
 }

@@ -38,3 +38,14 @@ function getMonthlyStatus() {
   xhr.send();
 }
 
+function openEmailPopup(emailEntry)
+{
+   var selectedValue = $(emailEntry).attr("id");
+   var values = selectedValue.split('&');
+
+   var fileName=values[1];
+
+   $("#emailFileName").val(fileName);
+
+   $("#emailEntryModal").modal("show");
+}

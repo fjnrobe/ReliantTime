@@ -140,30 +140,30 @@
                                 <tr>
                                     <td><b>Total</b></td>
                                     <td style="text-align: right"><span id="totalHours">${totalHours!0.0}</span></td>
-                                    <td style="text-align: right"><span id="totalGross">${totalGross?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="totalPassthru">${totalPassthru?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="totalAdjustedGross">${totalAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="totalGross">${totalGross!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="totalPassthru">${totalPassthru!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="totalAdjustedGross">${totalAdjustedGross!0.0?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Billed</b></td>
                                     <td style="text-align: right"><span id="billedHours">${billedHours!0.0}</span></td>
-                                    <td style="text-align: right"><span id="billedGross">${billedGross?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="billedPassthru">${billedPassthru?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="billedAdjustedGross">${billedAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="billedGross">${billedGross!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="billedPassthru">${billedPassthru!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="billedAdjustedGross">${billedAdjustedGross!0.0?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Due</b></td>
                                     <td style="text-align: right"><span id="dueHours">${dueHours!0.0}</span></td>
-                                    <td style="text-align: right"><span id="dueGross">${dueGross?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="duePassthru">${duePassthru?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="dueAdjustedGross">${dueAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="dueGross">${dueGross!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="duePassthru">${duePassthru!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="dueAdjustedGross">${dueAdjustedGross!0.0?string.currency}</span></td>
                                 </tr>
                                 <tr>
                                     <td><b>Remaining</b></td>
                                     <td style="text-align: right"><span id="remHours">${remHours!0.0}</span></td>
-                                    <td style="text-align: right"><span id="remGross">${remGross?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="remPassthru">${remPassthru?string.currency}</span></td>
-                                    <td style="text-align: right"><span id="remAdjustedGross">${remAdjustedGross?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="remGross">${remGross!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="remPassthru">${remPassthru!0.0?string.currency}</span></td>
+                                    <td style="text-align: right"><span id="remAdjustedGross">${remAdjustedGross!0.0?string.currency}</span></td>
                                 </tr>
 
                             </tbody>
