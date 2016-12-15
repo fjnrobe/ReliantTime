@@ -1,5 +1,6 @@
 package DocumentDtoMappers;
 
+import common.FieldConstants;
 import dtos.BaseDto;
 import dtos.SirPcrDto;
 import org.bson.Document;
@@ -26,6 +27,7 @@ public class SirPcrMapper extends BaseMapper {
         sir.setSirPcrNumber(doc.getString("sirPcrNumber"));
         sir.setSirType(doc.getString("sirType"));
         sir.setSubProcessDesc(doc.getString("subprocessDesc"));
+        sir.setNotes(doc.getString(FieldConstants.NOTE));
         sir.setCreateDate(doc.getDate("createDate"));
         if (doc.getDate("updateDate") != null) {
             sir.setUpdateDate(doc.getDate("updateDate"));
@@ -49,6 +51,7 @@ public class SirPcrMapper extends BaseMapper {
         doc.put("subprocessDesc", sir.getSubProcessDesc());
         doc.put("createDate", sir.getCreateDate());
         doc.put("updateDate", sir.getUpdateDate());
+        doc.put(FieldConstants.NOTE, sir.getNotes());
 
         return doc;
     }

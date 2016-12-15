@@ -16,6 +16,15 @@ public class SirPcrDto extends BaseDto {
     private boolean completedInd;
     private String nickName;
     private String subProcessDesc;
+    private String notes;
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     private ArrayList<LogDto> logs;
 

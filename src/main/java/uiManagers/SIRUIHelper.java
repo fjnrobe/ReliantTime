@@ -51,6 +51,9 @@ public class SIRUIHelper {
         {
             sir.setCompletedInd(false);
         }
+        if (!StringUtils.isEmpty(request.queryParams("sirNote"))) {
+            sir.setNotes(request.queryParams("sirNote"));
+        }
 
         if (includeLog) {
             LogDto log = new LogDto();
@@ -91,6 +94,7 @@ public class SIRUIHelper {
         root.put("nickName", sir.getNickName());
         root.put("description", sir.getSirDesc());
         root.put("completed", sir.getCompletedInd());
+        root.put("sirNote", sir.getNotes());
         root.put("sirCreateDate", DateTimeUtils.DateToString(sir.getCreateDate(), DateTimeUtils.DateFormats.ISO, false));
         root.put("sirUpdateDate", DateTimeUtils.DateToString(sir.getUpdateDate(), DateTimeUtils.DateFormats.ISO, false));
 

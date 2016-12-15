@@ -680,6 +680,28 @@ public class MainController {
 
         });
 
+        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS, TemplateConstants.MONTHLY_STATUS) {
+            @Override
+            public void doHandle(Request request, Response response, Writer writer)
+                    throws IOException, TemplateException{
+
+                MonthYear yearMonth = new MonthYear(request.queryParams("monthYears"));
+
+                String fileName = reportManager.writeMonthlyStatus(yearMonth);
+
+                HashMap<String, Object> root = new HashMap<String, Object>();
+                List<MonthYear> aList = reportManager.getAllMonthsWithLoggedPeriods(true);
+                root.put("monthYears", aList);
+
+                List<FileNameDto> fileList = reportManager.getStatusFileList();
+                root.put("fileList", fileList);
+
+                root.put("toAddresses", emailManager.getToEmailAddresses());
+
+                template.process(root, writer);
+            }
+
+        });
 
         post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_INVOICE_EMAILFILE,
                 TemplateConstants.MONTHLY_STATUS) {

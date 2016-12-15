@@ -945,7 +945,12 @@ public class ReportsManager {
 
     public String writeMonthlyStatus(MonthYear monthYear)
     {
-        String fileName = "c:\\ReliantTime\\files\\Monthly_Status_" + monthYear.getMonthName() + "_" + monthYear.getYearName() + ".xls";
+        Properties props =  SystemManager.loadProperties();
+        String filePath = props.getProperty(SystemConstants.FILE_DIRECTORY);
+        String fileTemplate = props.getProperty(SystemConstants.STATUS_FILE_NAME_TEMPLATE);
+
+        String fileName = fileTemplate.replace("{month}", monthYear.getMonthName());
+        fileName = filePath + "/" + fileName.replace("{year}", monthYear.getYearName());
 
         try {
             HSSFWorkbook workbook = this.createMonthlyStatus(monthYear);

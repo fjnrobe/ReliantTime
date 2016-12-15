@@ -18,7 +18,7 @@
     <div class="panel-heading">Monthly Status Report</div>
         <div class="panel-body">
             <div class="well well-sm">
-                <form class="form-inline" method="Get" id="frmMonthlyStatus">
+                <form class="form-inline" method="Post" id="frmMonthlyStatus" action="/reports/monthlyStatus">
                      <div class="col-md-3">
                           <select class="form-control" id="monthYears" name="monthYears">
                               <#list monthYears as monthYear>
@@ -27,9 +27,8 @@
                           </select>
                     </div>
                     <div class="form-group">
-                         <button type="button" class="btn btn-default btn-sm"
-                                id="btnGetInnotasData"
-                                onclick="getMonthlyStatus()">
+                         <button type="submit" class="btn btn-default btn-sm"
+                                id="btnCreateReport">
                             Generate Report
                          </button>
                     </div>

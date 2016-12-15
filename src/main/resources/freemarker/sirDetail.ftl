@@ -68,67 +68,78 @@
                         <input type="hidden" id="logCreateDate" name="logCreateDate" <#if logCreateDate??>value="${logCreateDate?datetime}"</#if>>
                         <input type="hidden" id="logUpdateDate" name="logUpdateDate" <#if logUpdateDate??>value="${logUpdateDate?datetime}"</#if>>
                         <div class="well">
-                            <div class="form-group">
-
-                                <label class="control-label col-md-2" for="sirType">SIR Type:</label>
-                                <div class="col-md-5">
-                                     <select class="form-control" id="sirType" name="sirType">
-                                        <option <#if (sirType!"") == "SIR">selected</#if>>SIR</option>
-                                        <option <#if (sirType!"") == "PCR">selected</#if>>PCR</option>
-                                        <option <#if (sirType!"") == "OTHER">selected</#if>>OTHER</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label col-md-2" for="subProcess">Sub Process:</label>
-                                <div class="col-md-5">
-                                    <select class="form-control" id="subProcess" name="subProcess">
-                                        <option></option>
-                                        <#list subProcessTypes as type>
-                                            <#if (subProcess!"") == type.lovDescription>
-                                                <option value="${type.lovDescription}" selected>${type.lovDescription}</option>
-                                             <#else>
-                                                 <option value="${type.lovDescription}">${type.lovDescription}</option>
-                                              </#if>
-                                        </#list>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-md-2" for="sirNumber">SIR/PCR Number:</label>
-                                <div class="col-md-5">
-                                   <Input type="text" class="form-control" id="sirNumber" name="sirNumber" value="${sirNumber!""}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-md-2" for="nickName">Nick Name:</label>
-                                <div class="col-md-5">
-                                    <input Type="text" id="nickName" name="nickName" class="form-control" value="${nickName!""}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-md-2" for="description">Description:</label>
-                                <div class="col-md-5">
-                                    <textarea id="description" name="description" class="form-control" rows="5">${description!""}</textarea>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-offset-2 col-md-5">
-                                    <div class="checkbox">
-                                        <label><input type="checkbox" value="Y" id="completed" name="completed"
-                                                      <#if completed!false>checked</#if>>Completed?</label>
+                          <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="sirType">SIR Type:</label>
+                                    <div class="col-md-9">
+                                         <select class="form-control" id="sirType" name="sirType">
+                                            <option <#if (sirType!"") == "SIR">selected</#if>>SIR</option>
+                                            <option <#if (sirType!"") == "PCR">selected</#if>>PCR</option>
+                                            <option <#if (sirType!"") == "OTHER">selected</#if>>OTHER</option>
+                                        </select>
                                     </div>
                                 </div>
-                             </div>
 
-                            <div class="form-group">
-                                <div class="col-md-offset-2 col-md-5">
-                                    <button type="submit" class="btn btn-default btn-sm" id="saveBtn">
-                                    <span class="glyphicon glyphicon-ok"></span> Save</button>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="subProcess">Sub Process:</label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" id="subProcess" name="subProcess">
+                                            <option></option>
+                                            <#list subProcessTypes as type>
+                                                <#if (subProcess!"") == type.lovDescription>
+                                                    <option value="${type.lovDescription}" selected>${type.lovDescription}</option>
+                                                 <#else>
+                                                     <option value="${type.lovDescription}">${type.lovDescription}</option>
+                                                  </#if>
+                                            </#list>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="sirNumber">SIR/PCR Number:</label>
+                                    <div class="col-md-9">
+                                       <Input type="text" class="form-control" id="sirNumber" name="sirNumber" value="${sirNumber!""}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="nickName">Nick Name:</label>
+                                    <div class="col-md-9">
+                                        <input Type="text" id="nickName" name="nickName" class="form-control" value="${nickName!""}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="description">Description:</label>
+                                    <div class="col-md-9">
+                                        <textarea id="description" name="description" class="form-control" rows="5">${description!""}</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <div class="checkbox">
+                                            <label><input type="checkbox" value="Y" id="completed" name="completed"
+                                                          <#if completed!false>checked</#if>>Completed?</label>
+                                        </div>
+                                    </div>
+                                 </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button type="submit" class="btn btn-default btn-sm" id="saveBtn">
+                                        <span class="glyphicon glyphicon-ok"></span> Save</button>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-md-6">
 
+                                <div class="form-group">
+                                    <label class="control-label col-md-2" for="sirNote">Notes:</label>
+                                    <div class="col-md-12">
+                                        <textarea id="sirNote" name="sirNote" class="form-control" rows="20">${sirNote!""}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
                         </div>
 
                         <div class="panel panel-primary">
@@ -170,7 +181,7 @@
                         <input type="hidden" id="returnPageParms" name="returnPageParms" value="${returnPageParms}">
                     </form>
                   </div>
-                </div>
+
               </div>
             </div>
         </div>
