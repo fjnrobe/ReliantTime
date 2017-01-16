@@ -45,6 +45,18 @@ public class SirPcrManager {
         return this.sirPcrDao.getSirByNickName(nickname);
     }
 
+    public void deleteLog(String logId)
+    {
+        LogDto logDto = this.logDao.getByLogId(new ObjectId(logId));
+
+        this.logDao.deleteByLogId(new ObjectId(logId));
+
+        //need to compute the actual hours attributable to the log entry
+        //given overlaps with other logs
+        this.updateLogHours(logDto.getLogDate());
+
+    }
+
     public List<ErrorDto> validateAndSaveSir(SirPcrDto sirDto) {
         List<ErrorDto> errors = this.validateSir(sirDto);
         if (errors.isEmpty()) {
@@ -273,7 +285,7 @@ public class SirPcrManager {
                     totHours += (logPeriod.getHours() * hours);
                 }
             }
-            overlappingLog.setHours(NumberUtils.roundHours(totHours));
+            overlappingLog.setHours(NumberUtils.roundHoursFourDecimals(totHours));
 
         }
 
@@ -409,7 +421,7 @@ public class SirPcrManager {
 
         List<LogDto> logDtos = this.logDao.getLogsBySirObjectId(sirId);
         for (LogDto logDto : logDtos) {
-            logDto.setHours(NumberUtils.roundHours(logDto.getHours()));
+            logDto.setHours(NumberUtils.roundHoursFourDecimals(logDto.getHours()));
             sirPcrDto.getLogs().add(logDto);
         }
 

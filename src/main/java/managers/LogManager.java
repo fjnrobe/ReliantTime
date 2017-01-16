@@ -29,7 +29,7 @@ public class LogManager {
         List<CalendarDto> hours = this.logDao.getCalendarHoursByMonth(monthYear);
         for (CalendarDto hour : hours)
         {
-            hour.setHours(NumberUtils.roundHours(hour.getHours()));
+            hour.setHours(NumberUtils.roundHoursFourDecimals(hour.getHours()));
         }
 
         return hours;
@@ -67,10 +67,6 @@ public class LogManager {
         return monthsWithHours;
     }
 
-    public long deleteLog(String logId)
-    {
-        return this.logDao.deleteByLogId(new ObjectId(logId));
-    }
 
     public Long getUsageCount(String columnName, String columnValue)
     {

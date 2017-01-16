@@ -53,11 +53,12 @@ public class DateTimeUtils {
 
 	public static Date getNullDate()
 	{
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-ddhh:mm:ss.SSS");
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
 		Date retDate = null;
 
 		try {
-			retDate = df.parse("2600-12-31");
+			retDate = df.parse("2600-12-3100:00:00.000");
 		} catch (Exception e)
 		{
 			//
@@ -159,6 +160,14 @@ public class DateTimeUtils {
 		cal.setTime(date);
 
 		return cal.get(Calendar.MONTH);
+	}
+
+	public static int getYearFromDate(Date date)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+
+		return cal.get(Calendar.YEAR);
 	}
 
 	public static String DateToString(Date date, DateFormats format, boolean includeSeparator) {
@@ -521,20 +530,19 @@ public class DateTimeUtils {
 		return interval;
 	}
 
-	public static String reformatDate(String dateToReformat, DateFormats originalFormat, boolean separatorInOriginal, DateFormats newFormat, boolean separatorInNew)
+	public static String reformatDate(String dateToReformat, DateFormats originalFormat, String separatorInOriginal, DateFormats newFormat, String separatorInNew)
 	{
 		String newDate = "";
 
+		String m;
+		String d;
+		String y;
 
 		if (originalFormat == DateFormats.MMDDYYYY)
 		{
-			String m;
-			String d;
-			String y;
-
-			if (separatorInOriginal)
+			if (separatorInOriginal != null)
 			{
-				String[] parts = dateToReformat.split("/");
+				String[] parts = dateToReformat.split(separatorInOriginal);
 				m = "0" + parts[0];
 				m = m.substring(m.length() - 2);
 
@@ -552,10 +560,10 @@ public class DateTimeUtils {
 			
 			if (newFormat == DateFormats.YYYYMMDD)
 			{
-				if (separatorInNew)
+				if (separatorInNew != null)
 				{
-					newDate = y + "/" +
-							m + "/" +
+					newDate = y + separatorInNew +
+							m + separatorInNew +
 							d;
 				}
 				else
@@ -568,24 +576,53 @@ public class DateTimeUtils {
 		} 
 		else
 		{
-			if (separatorInOriginal)
+			if (separatorInOriginal != null)
 			{
-				//need code to remove separator
+				String[] parts = dateToReformat.split(separatorInOriginal);
+				m = "0" + parts[1];
+				m = m.substring(m.length() - 2);
+
+				d = "0" + parts[2];
+				d = d.substring(d.length() - 2);
+
+				y = parts[0];
+
+			}
+			else
+			{
+				y = dateToReformat.substring(0, 4);
+				m = dateToReformat.substring(4,6);
+				d = dateToReformat.substring(6,8);
 			}
 			
 			if (newFormat == DateFormats.MMDDYYYY)
 			{
-				if (separatorInNew)
+				if (separatorInNew != null)
 				{
-					newDate = dateToReformat.substring(4, 6) + "/" +
-							dateToReformat.substring(6,8) + "/" +
-							dateToReformat.substring(0,4);
+					newDate = m + separatorInNew +
+							d + separatorInNew +
+							y;
 				}
 				else
 				{
-					newDate = dateToReformat.substring(4, 6) +
-							dateToReformat.substring(6,8) +
-							dateToReformat.substring(0,4);
+					newDate = m +
+							d +
+							y;
+				}
+			}
+			else
+			{
+				if (separatorInNew != null)
+				{
+					newDate = y + separatorInNew +
+							m + separatorInNew +
+							d;
+				}
+				else
+				{
+					newDate = y +
+							m +
+							d;
 				}
 			}
 		}

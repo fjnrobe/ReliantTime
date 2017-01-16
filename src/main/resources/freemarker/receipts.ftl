@@ -12,17 +12,17 @@
 </head>
 <body>
 
- <#include "/header.ftl">
- <div class="container-fluid">
 
+ <div class="container-fluid">
+     <#include "/header.ftl"/>
     <div class="panel-group">
 
-        <#include "/errors.ftl">
+        <#include "/errors.ftl"/>
         <div class="panel panel-primary">
             <div class="panel-heading">
                 Edit Invoices
             </div>
-            <div class="panel-body">
+            <table class="panel-body">
 
                 <div class="well">
                     <div class="form-group">
@@ -71,16 +71,20 @@
                                     <td>${row.invoiceDate?date}</td>
                                     <td>${row.receivedDate?date}</td>
                                     <td><a id="lnkEdit&${row?index}" onclick="editRevenueEntry(this)">
-                                        <span class="glyphicon glyphicon-pencil"></span>
+                                        <span class="glyphicon glyphicon-pencil"></span></a>
                                     </td>
                                     <td><a id="lnkDelete&${row?index}" onclick="deleteRevenueEntry(this)">
-                                        <span class="glyphicon glyphicon-remove-sign"></span>
+                                        <span class="glyphicon glyphicon-remove-sign"></span></a>
                                     </td>
                                     <td>
                                       <a id="lnkDownLoad&${row?index}"
                                          href="/reports/invoice/${row.invoiceNumber}">
-                                         <span class="glyphicon glyphicon-download"></span>
+                                         <span class="glyphicon glyphicon-download"></span></a>
                                     </td>
+                                    <td><a id="lnkEmail&${row?index}" onclick="openEmailPopup(this)">
+                                        <span class="glyphicon glyphicon-envelope"></span></a></td>
+                                    </td>
+                                </tr>
                             </#list>
                         </#if>
                     </tbody>
@@ -106,8 +110,8 @@
                                  </thead>
                                  <tbody  id="tblRevenueSummary">
                                      <#if revenueSummary??>
-                                         <#assign totGrossRevenue = 0>
-                                         <#assign totRecvRevenue = 0>
+                                         <#assign totGrossRevenue = 0/>
+                                         <#assign totRecvRevenue = 0/>
                                          <#list revenueSummary as row>
                                              <tr>
 
@@ -116,8 +120,8 @@
                                                 <td style="text-align: right">${row.totalRecvGross?string.currency}</td>
                                               </tr>
 
-                                             <#assign totGrossRevenue = totGrossRevenue + row.totalGross>
-                                             <#assign totRecvRevenue = totRecvRevenue + row.totalRecvGross>
+                                             <#assign totGrossRevenue = totGrossRevenue + row.totalGross/>
+                                             <#assign totRecvRevenue = totRecvRevenue + row.totalRecvGross/>
 
 
                                          </#list>
@@ -131,13 +135,68 @@
                                          </tfoot>
                                      </#if>
                                  </tbody>
-                            </div>
+                            </table>
                         </div>
                     </div>
                 </#if>
             </div>
         </div>
     </div>
+ </div>
+
+ <!-- email Modal -->
+ <div id="emailEntryModal" class="modal" role="dialog">
+     <div class="modal-dialog modal-md">
+
+         <!-- Modal content-->
+         <div class="modal-content">
+
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">&times;</button>
+                 <h4 class="modal-title">Email Invoice</h4>
+             </div>
+             <div class="modal-body">
+                 <form  class="form-horizontal"
+                        id="emailForm"
+                        method="Post" action="/reports/invoice/emailFile">
+
+                     <input type="hidden" id="emailInvoiceNumber" name="emailInvoiceNumber"/>
+                     <div class="form-group">
+
+                         <label class="control-label col-md-3" for="toEmail">Send To:</label>
+                         <div class="col-md-9">
+                             <input type="text" id="toEmail" name="toEmail" list="emailAddressList" />
+                             <datalist id="emailAddressList">
+                                 <#if toAddresses??>
+                                     <#list toAddresses as entry>
+                                         <option value="${entry}">${entry}</option>
+
+                                     </#list>
+                                 </#if>
+                             </datalist>
+                         </div>
+                     </div>
+                     <div class="form-group">
+                         <label class="control-label col-md-3" for="subjectText">Subject:</label>
+                         <div class="col-md-9">
+                             <input type="text" id="subjectText" name="subjectText"/>
+                         </div>
+                     </div>
+                     <div class="form-group">
+                         <label class="control-label col-md-3" for="bodyText">Message:</label>
+                         <div class="col-md-9">
+                             <input type="textArea" id="bodyText" name="bodyText" rows="5"/>
+                         </div>
+                     </div>
+                     <button type="submit" id="btnSendEmail" name="btnSendEmail" class="btn btn-primary">Send</button>
+
+                 </form>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+             </div>
+         </div>
+     </div>
  </div>
 
  <!-- Edit Modal -->
@@ -149,15 +208,21 @@
 
          <div class="modal-header">
              <button type="button" class="close" data-dismiss="modal">&times;</button>
-             <h4 class="modal-title">Add/Edit Revenue</h4>
+             <h4 class="modal-title">Add/Edit Invoice</h4>
          </div>
          <div class="modal-body">
              <form  class="form-horizontal"
                     id="editRevenueForm"
                     method="Post" action="/revenue/update">
 
-                    <input type="hidden" id="id" name="id" value="${id!""}">
-
+                    <input type="hidden" id="id" name="id" value="${id!''}"/>
+                     <div class="form-group">
+                         <label class="control-label col-md-3" for="monthYear">Month / Year:</label>
+                         <div class="col-md-9">
+                             <input class="form-control"
+                                    type="month" id="monthYear" name="monthYear" required>
+                         </div>
+                     </div>
                       <div class="form-group">
                         <label class="control-label col-md-3" for="poNumber">PO Number</label>
                         <div class="col-md-9">
@@ -170,13 +235,7 @@
                               <input class="form-control" type="text" id="invoiceNumber" name="invoiceNumber" required>
                           </div>
                       </div>
-                      <div class="form-group">
-                          <label class="control-label col-md-3" for="monthYear">Month / Year:</label>
-                          <div class="col-md-9">
-                              <input class="form-control"
-                                 type="month" id="monthYear" name="monthYear" required>
-                          </div>
-                      </div>
+
 
                       <div class="form-group">
                           <label class="control-label col-md-3" for="hours">Hours:</label>
@@ -247,6 +306,7 @@
       </div>
     </div>
   </div>
+
 
 </body>
 </html>

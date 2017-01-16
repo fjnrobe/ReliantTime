@@ -6,12 +6,19 @@ import java.text.NumberFormat;
 
 public class NumberUtils {
 
-	public static double roundHours(double hours)
+
+	public static double roundHoursTwoDecimals(double hours)
 	{
 		DecimalFormat twoDecimals = new DecimalFormat("###.##");
 		return Double.valueOf(twoDecimals.format(hours));
 	}
-	
+
+	public static double roundHoursFourDecimals(double hours)
+	{
+		DecimalFormat twoDecimals = new DecimalFormat("###.####");
+		return Double.valueOf(twoDecimals.format(hours));
+	}
+
 	public static double roundDollars (double dollars)
 	{
 		DecimalFormat twoDecimals = new DecimalFormat("#####.00");

@@ -11,6 +11,7 @@ function loadInvoices(year)
 
 function loadNextInvoiceData(year)
 {
+   var apple;
    var nextInvoiceData;
    $.ajax({url: "/revenue/nextInvoice", async: false, success: function(result){
                 nextInvoiceData = JSON.parse(result);
@@ -18,6 +19,8 @@ function loadNextInvoiceData(year)
 
     return nextInvoiceData;
 }
+
+
 
 function loadInvoiceTable(invoiceList)
 {
@@ -61,10 +64,32 @@ function loadInvoiceTable(invoiceList)
         var lnkDownload = $("<a>", {id: "lnkDownLoad&" + i, href: "/reports/invoice/" + invoiceList[i].invoiceNumber}).appendTo(newCol);
         var glyphDelete = $("<span>", {class: "glyphicon glyphicon-download"}).appendTo(lnkDownload);
 
+        newCol = $("<td>").appendTo(newRow);
+        var lnkEmail = $("<a>", {id: "lnkEmail&" + i}).appendTo(newCol);
+        var glyphEmail = $("<span>", {class: "glyphicon glyphicon-envelope"}).appendTo(lnkEmail);
+
+        lnkEmail.click(function() {
+           openEmailPopup(this);
+        });
+
      }
 
 }
 
+/* this function is called when a user clicks on the email link for a given invoice */
+function openEmailPopup(emailEntry)
+{
+   var selectedValue = $(emailEntry).attr("id");
+   var values = selectedValue.split('&');
+
+   $("#emailInvoiceNumber").val(revenueListArray[values[1]].invoiceNumber);
+
+   $("#emailEntryModal").modal("show");
+
+}
+
+/* this function is called when the user clicks on the add button to add a new invoice. by default
+   the invoice will be initialized for the month/year following the last invoice created */
 function addRevenueEntry()
 {
     //retrieve the open PO Number and the next Invoice Number
@@ -130,7 +155,6 @@ $(document).ready(function(){
     $("#dropYears").change(function() {
         loadInvoices($("#dropYears").val());
     });
-
 
 });
 

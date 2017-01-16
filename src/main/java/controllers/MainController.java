@@ -1,8 +1,5 @@
 package controllers;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import common.*;
@@ -21,7 +18,6 @@ import utilities.SortUtils;
 import utilities.UrlEncoder;
 
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -369,7 +365,7 @@ public class MainController {
             @Override
             public Object handle(Request request, Response response) {
 
-                logManager.deleteLog(request.params(":logId"));
+                sirPcrManager.deleteLog(request.params(":logId"));
                 return "";
             }
         });
@@ -454,7 +450,8 @@ public class MainController {
                         sirPcrManager.getSirById(new ObjectId(request.queryParams("existingActivity")));
 
                 LogDto logDto = new LogDto();
-                logDto.setLogDate(request.queryParams("newLogDate"));
+                logDto.setLogDate(DateTimeUtils.reformatDate(request.queryParams("newLogDate"), DateTimeUtils.DateFormats.YYYYMMDD,
+                        "-", DateTimeUtils.DateFormats.YYYYMMDD, null));
                 sirPcrDto.getLogs().add(logDto);
 
                 HashMap<String, Object> root = new HashMap<String, Object>();
@@ -703,7 +700,7 @@ public class MainController {
 
         });
 
-        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_INVOICE_EMAILFILE,
+        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS_EMAILFILE,
                 TemplateConstants.MONTHLY_STATUS) {
             @Override
             public void doHandle(Request request, Response response, Writer writer)
@@ -725,6 +722,57 @@ public class MainController {
 
                 root.put("toAddresses", emailManager.getToEmailAddresses());
 
+                template.process(root, writer);
+
+            }
+        });
+
+        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_INVOICE_EMAILFILE,
+                TemplateConstants.REVENUE) {
+            @Override
+            public void doHandle(Request request, Response response, Writer writer)
+                    throws IOException, TemplateException {
+
+                String invoiceNumber = request.queryParams("emailInvoiceNumber");
+                String toAddress = request.queryParams("toEmail");
+                String subjectText = request.queryParams("subjectText");
+                String bodyText = request.queryParams("bodyText");
+
+                reportManager.setLogManager(logManager);
+                String fileName = reportManager.writeInvoicePackage(invoiceNumber);
+
+                emailManager.sendEmail(toAddress, subjectText, bodyText, fileName);
+
+                HashMap<String, Object> root = new HashMap<String, Object>();
+
+                List<InvoiceDto> invoiceDtos =
+                        financialManager.getAllInvoices();
+
+                //we want to summarize all revenue
+                List<InvoiceDto> summaryDtos = FinancialUIHelper.createRevenueFinancialSummary(invoiceDtos);
+
+                //create the list of years with invoices for the dropdown
+                List <String> years = FinancialUIHelper.createYearsWithInvoices(invoiceDtos);
+
+                FinancialSearchCriteriaDto searchDto = new FinancialSearchCriteriaDto();
+                searchDto.setInvoiceNumber(invoiceNumber);
+                List<InvoiceDto> currInvoiceDtos = financialManager.getInvoicesByCriteria(searchDto);
+                int queryYear = currInvoiceDtos.get(0).getMonthYear().getYear();
+
+                searchDto = new FinancialSearchCriteriaDto();
+                searchDto.setYear(String.valueOf(queryYear));
+                invoiceDtos = financialManager.getInvoicesByCriteria(searchDto);
+
+                SortUtils.sortFinancialDto(invoiceDtos, false);
+
+                root.put("yearList", years);
+                root.put("selectedYear", String.valueOf(queryYear));
+                root.put("revenueList", invoiceDtos);
+                root.put("revenueSummary", summaryDtos);
+                root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
+                root.put("toAddresses", emailManager.getToEmailAddresses());
+
+                root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
 
             }
@@ -842,7 +890,7 @@ public class MainController {
                 response.type("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                 response.header("Content-Disposition", "attachment; filename=filename.xls");
                 reportManager.setLogManager(logManager);
-                byte[] xls = reportManager.createInvoicePackage(invoiceNumber);
+                byte[] xls = reportManager.getInvoicePackage(invoiceNumber);
 
                 try {
 
@@ -858,6 +906,31 @@ public class MainController {
             }
         });
 
+//REST call
+        //invoked to generate/get the invoice for the incoming invoice number
+        get(new Route(URLConstants.REPORT_MONTHLY_INVOICE_XLS) {
+            @Override
+            public Object handle(Request request, Response response) {
+                String invoiceNumber = request.params(":invoiceNumber");
+
+                response.type("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                response.header("Content-Disposition", "attachment; filename=filename.xls");
+                reportManager.setLogManager(logManager);
+                byte[] xls = reportManager.getInvoicePackage(invoiceNumber);
+
+                try {
+
+                    response.raw().getOutputStream().write(xls);
+                    response.raw().flushBuffer();
+
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        });
 
         //called to load the SIR list page,
         get (new FreemarkerBasedRoute(URLConstants.MAINT_SIR_LIST, TemplateConstants.SIR_LIST) {
@@ -964,8 +1037,15 @@ public class MainController {
 
                 List<LovBaseDto> subProcessTypes = lovManager.getLovEntries(LOVEnum.SUB_PROCESS_TYPE);
 
+                SirHoursSummarySearchDto searchDto = new SirHoursSummarySearchDto();
+                searchDto.setSirPcrId(sirPcrDto.getId());
+
+                List<SirHoursSummaryDto> hoursByActivityList =
+                        reportManager.getSirHoursByActivity(searchDto);
+
                 root.put("subProcessTypes", subProcessTypes);
                 root.put("returnPageParms", returnPageParms);
+                root.put("hoursByActivityList", hoursByActivityList);
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
             }
@@ -1301,7 +1381,7 @@ public class MainController {
                 List <String> years = FinancialUIHelper.createYearsWithInvoices(invoiceDtos);
 
                 FinancialSearchCriteriaDto searchDto = new FinancialSearchCriteriaDto();
-                searchDto.setYear(String.valueOf(DateTimeUtils.getCurrentYear()));
+                searchDto.setYear(String.valueOf(years.get(0)));
                 invoiceDtos = financialManager.getInvoicesByCriteria(searchDto);
 
                 SortUtils.sortFinancialDto(invoiceDtos, false);
@@ -1310,6 +1390,7 @@ public class MainController {
                 root.put("revenueList", invoiceDtos);
                 root.put("revenueSummary", summaryDtos);
                 root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
+                root.put("toAddresses", emailManager.getToEmailAddresses());
 
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
@@ -1325,7 +1406,12 @@ public class MainController {
                 FinancialSearchCriteriaDto searchDto = new FinancialSearchCriteriaDto();
                 searchDto.setYear(year);
 
-                return JSONUtils.convertToJSON(financialManager.getInvoicesByCriteria(searchDto));
+                List<InvoiceDto> invoiceDtos =
+                        invoiceDtos = financialManager.getInvoicesByCriteria(searchDto);
+
+                SortUtils.sortFinancialDto(invoiceDtos, false);
+
+                return JSONUtils.convertToJSON(invoiceDtos);
             }
         });
 
@@ -1334,7 +1420,7 @@ public class MainController {
             @Override
             public Object handle(Request request, Response response) {
 
-                InvoiceDto dto = financialManager.getNextInvoice(DateTimeUtils.getLastMonthYear(new Date()));
+                InvoiceDto dto = financialManager.getNextInvoice();
                 String json = JSONUtils.convertToJSON(dto);
                 return json;
             }
@@ -1376,6 +1462,7 @@ public class MainController {
                     root.put("revenueList", invoiceDtos);
                     root.put("revenueSummary", summaryDtos);
                     root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
+                    root.put("toAddresses", emailManager.getToEmailAddresses());
 
                 }
                 root.put("errors", errors);
@@ -1404,6 +1491,7 @@ public class MainController {
                 root.put("revenueList", invoiceDtos);
                 root.put("revenueSummary", summaryDtos);
                 root.put("revenueListData",  JSONUtils.convertToJSON(invoiceDtos));
+                root.put("toAddresses", emailManager.getToEmailAddresses());
 
                 root.put("errors", new ArrayList<ErrorDto>());
                 template.process(root, writer);
@@ -1420,11 +1508,16 @@ public class MainController {
 
                 HashMap<String, Object> root = new HashMap<String, Object>();
 
-                List<String> years = logManager.getYearsWithLoggedPeriods();
-                String currentYear = "" + DateTimeUtils.getCurrentYear();
-
+              //  List<String> years = logManager.getYearsWithLoggedPeriods();
                 List<InvoiceDto> invoiceDtos =
                         financialManager.getAllInvoices();
+
+                //we want to summarize all revenue
+                List<InvoiceDto> summaryDtos = FinancialUIHelper.createRevenueFinancialSummary(invoiceDtos);
+                //create the list of years with invoices for the dropdown
+                List <String> years = FinancialUIHelper.createYearsWithInvoices(invoiceDtos);
+
+                String currentYear = "" + DateTimeUtils.getCurrentYear();
 
                 List<DeductionDto> deductionDtos =
                         deductionManager.getDeductionsByCriteria(null,

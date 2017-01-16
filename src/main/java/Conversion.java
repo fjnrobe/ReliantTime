@@ -128,8 +128,8 @@ public class Conversion {
 
                     LogDto logDto = new LogDto();
                     logDto.setCreateDate(DateTimeUtils.getSystemDate());
-                    logDto.setLogDate(DateTimeUtils.reformatDate(date, DateTimeUtils.DateFormats.MMDDYYYY,true,
-                                      DateTimeUtils.DateFormats.YYYYMMDD,false));
+                    logDto.setLogDate(DateTimeUtils.reformatDate(date, DateTimeUtils.DateFormats.MMDDYYYY,"/",
+                                      DateTimeUtils.DateFormats.YYYYMMDD,null));
                     logDto.setActivityDesc(activityType);
                     logDto.setPrimaveraDesc(primaVera);
                     logDto.setStartTime(convertTime(startTime));

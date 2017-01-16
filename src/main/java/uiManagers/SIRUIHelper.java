@@ -1,7 +1,5 @@
 package uiManagers;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import common.FieldConstants;
 import dtos.LogDto;
 import dtos.SirPcrDto;
 import dtos.SirPcrUIDto;
@@ -11,10 +9,7 @@ import org.bson.types.ObjectId;
 import spark.Request;
 import utilities.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,7 +65,9 @@ public class SIRUIHelper {
                 }
             }
             log.setSirPcrId(sir.getId());
-            log.setLogDate(request.queryParams("date"));
+            log.setLogDate(DateTimeUtils.reformatDate( request.queryParams("date"), DateTimeUtils.DateFormats.YYYYMMDD,
+                    "-",
+                    DateTimeUtils.DateFormats.YYYYMMDD,null));
             log.setStartTime(request.queryParams("startTime"));
             log.setEndTime(request.queryParams("endTime"));
             log.setNote(request.queryParams("note"));
@@ -118,7 +115,7 @@ public class SIRUIHelper {
             totHours += dto.getHours();
         }
 
-        root.put("totHours", NumberUtils.roundHours(totHours));
+        root.put("totHours", NumberUtils.roundHoursFourDecimals(totHours));
         if (sir.getLogs().size() >= 1)
         {
 

@@ -67,6 +67,15 @@ public class SortUtils {
         }
     }
 
+    private static class FileNameComparator implements Comparator<FileNameDto> {
+
+        public int compare (FileNameDto object1, FileNameDto object2)
+        {
+
+            return object1.getMonthYear().getSortKey().compareTo(object2.getMonthYear().getSortKey());
+        }
+    }
+
     private static class DtoSirDocComparator implements Comparator<SirPcrDto> {
 
         public int compare(SirPcrDto dto1, SirPcrDto dto2) {
@@ -164,6 +173,20 @@ public class SortUtils {
 
             return retValue;
         }
+    }
+
+    public static List<FileNameDto> sortFileNames(List<FileNameDto> fileNames, boolean ascending)
+    {
+        FileNameComparator comparator = new FileNameComparator();
+
+        Collections.sort(fileNames, comparator);
+
+        if (!ascending)
+        {
+            Collections.reverse(fileNames);
+        }
+
+        return fileNames;
     }
 
     public static List<TimesheetDto> sortHoursCalendarByWeekAndDay(List<TimesheetDto> reportRecords)

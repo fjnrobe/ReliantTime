@@ -143,7 +143,8 @@ public class LogDao extends BaseDao{
         String endDate = monthYear.getSortKey() + DateTimeUtils.getLastDayOfMonth(monthYear);
 
         Bson matchString = Aggregates.match(Filters.and(Filters.gte("logDate", startDate),
-                                                        Filters.lte("logDate", endDate)));
+                                                        Filters.lte("logDate", endDate),
+                                                        Filters.eq("billableInd", true)));
         Bson groupBy = Aggregates.group(Document.parse("{$substr: ['$logDate',6,2]}"),
                 Accumulators.sum("TotalHours", "$hours"));
         Bson sortBy = Aggregates.sort(new Document("_id",1));

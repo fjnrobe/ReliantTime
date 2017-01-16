@@ -142,7 +142,11 @@
                             <div class="form-group">
                                 <label class="control-label col-md-2" for="date">Date:</label>
                                 <div class="col-md-5">
-                                    <input Type="text" id="date" name="date" class="form-control" value="${date!""}">
+                                    <#assign dt = date[0..3] + "-" + date[4..5] + "-" + date[6..7]>
+
+                                        <input class="form-control"
+                                               type="date" id="date" name="date"
+                                               value="${dt}"/>
                                 </div>
                             </div>
 

@@ -1,12 +1,14 @@
+/* changes to the format of the date */
 function submitPage(dateToNavigateTo)
 {
     var returnUrl = '/dayEntry';
 
     if (dateToNavigateTo == "input")
     {
-        var d = new Date($("#dailyEntryDate").val);
-        console.log($("#dailyEntryDate").val);
+        var x = $("#dailyEntryDate").val();
+        var d = new Date(x);
         var fd = d.toISOString().slice(0,10).replace(/-/g,"");
+
 
         $("#dailyEntry").attr("action",returnUrl + "/" + fd);
     }
@@ -90,8 +92,12 @@ function deleteSir(sirId)
     $.ajax({url: "/sirDelete/" + sirId, async: false, success: function(result){
         $("#deleteLogModal").modal("hide");
 
+        var x = $("#dailyEntryDate").val();
+        var d = new Date(x);
+        var fd = d.toISOString().slice(0,10).replace(/-/g,"");
+
         //then reload the page to reflect the update
-        window.location.href = '/dayEntry/' + $("#dailyEntryDate").val();
+        window.location.href = '/dayEntry/' + fd;
     }});
 }
 
@@ -104,7 +110,10 @@ function deleteLog(logId)
         $("#deleteLogModal").modal("hide");
 
         //then reload the page
-        window.location.href = '/dayEntry/' + $("#dailyEntryDate").val();
+        var x = $("#dailyEntryDate").val();
+        var d = new Date(x);
+        var fd = d.toISOString().slice(0,10).replace(/-/g,"");
+        window.location.href = '/dayEntry/' + fd;
     }});
 }
 

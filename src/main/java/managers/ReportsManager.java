@@ -3,25 +3,20 @@ package managers;
 import com.mongodb.client.MongoDatabase;
 import common.MonthYear;
 import common.SystemConstants;
-import daos.InvoiceDao;
-import daos.LogDao;
-import daos.PurchaseOrderDao;
-import daos.SIRPCRDao;
+import daos.*;
 import dtos.*;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.bson.types.ObjectId;
-import spark.Response;
 import utilities.DateTimeUtils;
 import utilities.NumberUtils;
 import utilities.SortUtils;
 
-import java.awt.*;
 import java.io.*;
 
+import java.time.Month;
 import java.util.*;
 import java.util.List;
 
@@ -30,6 +25,7 @@ import java.util.List;
  */
 public class ReportsManager {
 
+    private final ReportsDao reportsDao;
     private final LogDao logDao;
     private final SIRPCRDao sirPcrDao;
     private final InvoiceDao invoiceDao;
@@ -38,6 +34,7 @@ public class ReportsManager {
 
     public ReportsManager(MongoDatabase reliantDb) {
 
+        reportsDao = new ReportsDao(reliantDb);
         logDao = new LogDao(reliantDb);
         sirPcrDao = new SIRPCRDao(reliantDb);
         invoiceDao = new InvoiceDao(reliantDb);
@@ -50,14 +47,78 @@ public class ReportsManager {
         this.logManager = logManager;
     }
 
+    public List<SirHoursSummaryDto> getSirHoursByActivity(SirHoursSummarySearchDto searchDto)
+    {
+        List<SirHoursSummaryDto> dtos = this.reportsDao.getSirHoursByActivity(searchDto);
+
+        for (SirHoursSummaryDto dto : dtos)
+        {
+            SirPcrDto sirDto = this.sirPcrDao.getSirById(dto.getSirPcrDto().getId());
+            dto.setSirPcrDto(sirDto);
+        }
+
+        return dtos;
+    }
+
     public List<LogDto> getInnotasHours(String startDate)
     {
         return this.logDao.getInnotasHours(startDate);
     }
 
-    public byte [] createInvoicePackage(String invoiceNumber)
+    public String writeInvoicePackage (String invoiceNumber)
+    {
+        Properties props =  SystemManager.loadProperties();
+        String filePath = props.getProperty(SystemConstants.FILE_DIRECTORY);
+        String fileTemplate = props.getProperty(SystemConstants.INVOICE_FILE_NAME_TEMPLATE);
+
+        FinancialSearchCriteriaDto searchCriteriaDto = new FinancialSearchCriteriaDto();
+        searchCriteriaDto.setInvoiceNumber(invoiceNumber);
+        List<InvoiceDto> invoiceDtos = this.invoiceDao.getInvoicesByCriteria(searchCriteriaDto);
+        InvoiceDto invoiceDto = invoiceDtos.get(0);
+
+        String fileName = fileTemplate.replace("{month}", invoiceDto.getMonthYear().getMonthName());
+        fileName = fileName.replace("{invoice}", invoiceNumber);
+        fileName = fileName.replace("{year}", invoiceDto.getMonthYear().getYearName());
+
+        try {
+            HSSFWorkbook workbook = this.createInvoicePackage(invoiceNumber);
+            FileOutputStream outputStream = new FileOutputStream(filePath + "//" + fileName);
+            workbook.write( outputStream);
+
+            outputStream.flush();
+            //workbook.close();
+            outputStream.close();
+
+
+        } catch (Exception e)
+        {
+            fileName = null;
+        }
+
+        return fileName;
+    }
+
+    public byte[] getInvoicePackage (String invoiceNumber)
     {
         byte[] outArray = new byte[0];
+        HSSFWorkbook workbook = this.createInvoicePackage(invoiceNumber);
+
+        try {
+
+            ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+            workbook.write(outByteStream);
+            workbook.close();
+            outArray = outByteStream.toByteArray();
+        }
+        catch (Exception e)
+        {
+
+        }
+        return outArray;
+    }
+
+    public HSSFWorkbook createInvoicePackage(String invoiceNumber)
+    {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         try {
@@ -70,16 +131,13 @@ public class ReportsManager {
             this.createMonthlyTimesheet(workbook, invoiceDto.getMonthYear());
             this.createMonthlyInvoice(workbook, invoiceNumber);
 
-            ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-            workbook.write(outByteStream);
-            workbook.close();
-            outArray = outByteStream.toByteArray();
         }
         catch (Exception e)
         {
+            e.printStackTrace();
 
         }
-        return outArray;
+        return workbook;
 
     }
 
@@ -118,7 +176,12 @@ public class ReportsManager {
             //write the header row
             cell.setCellValue("Reliant Software, LLC");
             cell.setCellStyle(this.createStyle(workbook, true, false,false,false));
-
+            sheet.addMergedRegion(new CellRangeAddress(
+                    rowIdx-1, //first row (0-based)
+                    rowIdx-1, //last row (0-based)
+                    0, //first column (0-based)
+                    1 //last column (0-based)
+            ));
             cell = row.createCell(4);
             cell.setCellValue("RS-LLC");
             cell.setCellStyle(this.createStyle(workbook, true, false,false,false));
@@ -139,6 +202,12 @@ public class ReportsManager {
             row = sheet.createRow(rowIdx++);
             cell = row.createCell(0);
             cell.setCellValue("Belmonte Enterprises, LLC");
+            sheet.addMergedRegion(new CellRangeAddress(
+                    rowIdx-1, //first row (0-based)
+                    rowIdx-1, //last row (0-based)
+                    0, //first column (0-based)
+                    1 //last column (0-based)
+            ));
 
             row = sheet.createRow(rowIdx++);
             row.setHeight((short) (55*20));
@@ -344,7 +413,7 @@ public class ReportsManager {
             cell.setCellStyle(style);
 
             cell = row.createCell(4);
-            double netGross = invoiceDto.getTotalGross() - (purchaseOrderDto.getPassthruRate() * invoiceDto.getHours());
+            double netGross = invoiceDto.getHours() * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate());
 
             cell.setCellValue(netGross);
             style = workbook.createCellStyle();
@@ -590,9 +659,6 @@ public class ReportsManager {
 
         PurchaseOrderDto purchaseOrderDto = this.purchaseOrderDao.getPurchaseOrderByMonthYear(monthYear);
 
-//        byte [] outArray = new byte[0];
-//        HSSFWorkbook workbook = new HSSFWorkbook();
-
         HSSFSheet sheet = workbook.createSheet("timesheet " + monthYear.getMonthName() + " " +
                 monthYear.getYearName() +
                 " " + purchaseOrderDto.getPoNumber());
@@ -626,13 +692,24 @@ public class ReportsManager {
             //write the header row
             cell.setCellValue("Belmonte Enterprises, LLC");
             cell.setCellStyle(this.createStyle(workbook, true, false,false,false));
+            sheet.addMergedRegion(new CellRangeAddress(
+                    rowIdx-1, //first row (0-based)
+                    rowIdx-1, //last row (0-based)
+                    0, //first column (0-based)
+                    1 //last column (0-based)
+            ));
 
-            cell = row.createCell(8);
+            cell = row.createCell(7);
             cell.setCellValue("Monthly Time Sheet");
             HSSFCellStyle style = this.createStyle(workbook, true, false,false,false);
             style.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
             cell.setCellStyle(style);
-
+            sheet.addMergedRegion(new CellRangeAddress(
+                    rowIdx-1, //first row (0-based)
+                    rowIdx-1, //last row (0-based)
+                    7, //first column (0-based)
+                    8 //last column (0-based)
+            ));
             row = sheet.createRow(rowIdx++);
             cell = row.createCell(0);
             cell.setCellValue("1315 39th Street");
@@ -935,7 +1012,7 @@ public class ReportsManager {
         while (iterator.hasNext())
         {
             TimesheetDto record = (TimesheetDto) iterator.next();
-            record.setHoursForDay(NumberUtils.roundHours(record.getHoursForDay()));
+            record.setHoursForDay(NumberUtils.roundHoursTwoDecimals(record.getHoursForDay()));
             timesheetDtos.add(record);
 
         }
@@ -1043,7 +1120,6 @@ public class ReportsManager {
         int rowIdx = 0;
         int colIdx = 0;
         String line = "";
-       // String fileName = "Monthly_Status_" + monthYear.getMonthName() + "_" + monthYear.getYearName() + ".html";
 
         String statusDesc = "";
         String estCompleteDate = "";
@@ -1224,7 +1300,7 @@ public class ReportsManager {
                 cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
-                cell.setCellValue(String.valueOf(NumberUtils.roundHours(data.getHoursWithinWeek())));
+                cell.setCellValue(String.valueOf(NumberUtils.roundHoursTwoDecimals(data.getHoursWithinWeek())));
                 cell.setCellStyle(detailCell);
 
                 cell = row.createCell(colIdx++);
@@ -1248,7 +1324,7 @@ public class ReportsManager {
 
             row = sheet.createRow(rowIdx++);
             cell = row.createCell(0);
-            cell.setCellValue("Total Monthly Hours: " + String.valueOf(NumberUtils.roundHours(monthTotalHours)));
+            cell.setCellValue("Total Monthly Hours: " + String.valueOf(NumberUtils.roundHoursTwoDecimals(monthTotalHours)));
             cell.setCellStyle(headerCell);
 
             sheet.setColumnWidth(0, 20*256);
@@ -1356,69 +1432,68 @@ public class ReportsManager {
 
         for (LogDto logInMonth : logsInMonth)
         {
-            SirPcrViewDto viewDto = new SirPcrViewDto();
-            viewDto.setLogDto(logInMonth);
-            viewDto.setSirPcrDto(this.sirPcrDao.getSirById(logInMonth.getSirPcrId()));
+            if (logInMonth.getBillableInd() == true) {
+                SirPcrViewDto viewDto = new SirPcrViewDto();
+                viewDto.setLogDto(logInMonth);
+                viewDto.setSirPcrDto(this.sirPcrDao.getSirById(logInMonth.getSirPcrId()));
 
-            //get the entry in the report set for the current sir in the current week
-            Calendar cal = DateTimeUtils.isValidDate(logInMonth.getLogDate(),
-                                            DateTimeUtils.DateFormats.YYYYMMDD);
+                //get the entry in the report set for the current sir in the current week
+                Calendar cal = DateTimeUtils.isValidDate(logInMonth.getLogDate(),
+                        DateTimeUtils.DateFormats.YYYYMMDD);
 
-            int weekInMonth = cal.get(Calendar.WEEK_OF_MONTH);
-            String entryKey = this.reportRecordEntryKey(weekInMonth, logInMonth.getSirPcrId().toString());
+                int weekInMonth = cal.get(Calendar.WEEK_OF_MONTH);
+                String entryKey = this.reportRecordEntryKey(weekInMonth, logInMonth.getSirPcrId().toString());
 
-            ReportRecordDto reportRecord = reportRecordMap.get(entryKey);
-            //if we haven't added one yet, add it now
-            if (reportRecord == null)
-            {
-                reportRecord = new ReportRecordDto();
-                reportRecord.setSirPcrViewDto(viewDto);
-                reportRecord.setWeekOfMonth(cal.get(Calendar.WEEK_OF_MONTH));
+                ReportRecordDto reportRecord = reportRecordMap.get(entryKey);
+                //if we haven't added one yet, add it now
+                if (reportRecord == null) {
+                    reportRecord = new ReportRecordDto();
+                    reportRecord.setSirPcrViewDto(viewDto);
+                    reportRecord.setWeekOfMonth(cal.get(Calendar.WEEK_OF_MONTH));
 
-                //initialize a calendar to the current month being processed
-                Calendar week = Calendar.getInstance();
-               // week.set(Calendar.MONTH, cal.get(Calendar.MONTH));
-                week.set(monthYear.getYear(), monthYear.getMonth() - 1, 1);
+                    //initialize a calendar to the current month being processed
+                    Calendar week = Calendar.getInstance();
+                    // week.set(Calendar.MONTH, cal.get(Calendar.MONTH));
+                    week.set(monthYear.getYear(), monthYear.getMonth() - 1, 1);
 
-                //to get the first day of the week - create a calendar and then set the week to the sir's week in the month
-                //and set the day of the week to Sunday - the first day of each week
+                    //to get the first day of the week - create a calendar and then set the week to the sir's week in the month
+                    //and set the day of the week to Sunday - the first day of each week
 
-                //need to capture the last day of month - below when adding 6 days to get the end of the
-                //week, we could go into the next month
-                int lastDayOfMonth =  week.getActualMaximum(Calendar.DAY_OF_MONTH);
-                week.set(Calendar.WEEK_OF_MONTH, cal.get(Calendar.WEEK_OF_MONTH));
-                week.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                reportRecord.setFirstDayOfWeek(week.get(Calendar.DATE));
+                    //need to capture the last day of month - below when adding 6 days to get the end of the
+                    //week, we could go into the next month
+                    int lastDayOfMonth = week.getActualMaximum(Calendar.DAY_OF_MONTH);
+                    week.set(Calendar.WEEK_OF_MONTH, cal.get(Calendar.WEEK_OF_MONTH));
+                    week.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                    reportRecord.setFirstDayOfWeek(week.get(Calendar.DATE));
 
-                //if the day of week is greater than current day, we went back to the prior month - need to back
-                //up to the first of the month (which is always 1)
-                if (reportRecord.getFirstDayOfWeek() > cal.get(Calendar.DAY_OF_MONTH))
-                {
-                    reportRecord.setFirstDayOfWeek(1);
+                    //if the day of week is greater than current day, we went back to the prior month - need to back
+                    //up to the first of the month (which is always 1)
+                    if (reportRecord.getFirstDayOfWeek() > cal.get(Calendar.DAY_OF_MONTH)) {
+                        reportRecord.setFirstDayOfWeek(1);
+                    }
+
+                    //to get the end of the week, add 6 days to the calendar
+                    week.add(Calendar.DAY_OF_WEEK, 6);
+                    reportRecord.setLastDayOfWeek(week.get(Calendar.DATE));
+
+                    //if the last day of the week is before the first day of the week, we've past into the next month.
+                    //in this case, set the last day of the week to the last day of the month
+                    if (reportRecord.getLastDayOfWeek() < reportRecord.getFirstDayOfWeek()) {
+                        reportRecord.setLastDayOfWeek(lastDayOfMonth);
+                    }
+
+                    reportRecordMap.put(entryKey, reportRecord);
                 }
 
-                //to get the end of the week, add 6 days to the calendar
-                week.add(Calendar.DAY_OF_WEEK, 6);
-                reportRecord.setLastDayOfWeek(week.get(Calendar.DATE));
-
-                //if the last day of the week is before the first day of the week, we've past into the next month.
-                //in this case, set the last day of the week to the last day of the month
-                if (reportRecord.getLastDayOfWeek() < reportRecord.getFirstDayOfWeek() )
-                {
-                    reportRecord.setLastDayOfWeek(lastDayOfMonth);
-                }
-
-                reportRecordMap.put(entryKey, reportRecord);
+                //finally, we need to tally the number of hours of the current sir that fall within the current week
+                reportRecord.setHoursWithinWeek(reportRecord.getHoursWithinWeek() + viewDto.getLogDto().getHours());
             }
-
-            //finally, we need to tally the number of hours of the current sir that fall within the current week
-            reportRecord.setHoursWithinWeek(reportRecord.getHoursWithinWeek() + viewDto.getLogDto().getHours());
         }
         Iterator iterator =  reportRecordMap.values().iterator();
         while (iterator.hasNext())
         {
             ReportRecordDto record = (ReportRecordDto) iterator.next();
-            record.setHoursWithinWeek(NumberUtils.roundHours(record.getHoursWithinWeek()));
+            record.setHoursWithinWeek(NumberUtils.roundHoursTwoDecimals(record.getHoursWithinWeek()));
             reportRecords.add(record);
 
         }
@@ -1500,6 +1575,69 @@ public class ReportsManager {
         for (File file : listOfFiles) {
             if (file.isFile()) {
                 //see if the file matches the pattern for status reports
+                if (file.getName().startsWith(statusFilePattern))
+                {
+                    FileNameDto fileNameDto = new FileNameDto();
+                    fileNameDto.setFileName(file.getName());
+                    fileNameDto.setFileNameWithPath(file.getPath());
+                    fileNameDto.setMonthYear(this.parseMonthYear(file.getName()));
+                    fileNames.add(fileNameDto);
+                }
+            }
+        }
+
+        SortUtils.sortFileNames(fileNames, false);
+
+        return fileNames;
+    }
+
+    private MonthYear parseMonthYear(String fileName)
+    {
+        //the file pattern is:
+        //Monthly_Status_JRobertson_{month}_{year}.xls
+
+        int lastUnderlineAt = fileName.lastIndexOf("_");
+
+        String year = fileName.substring(lastUnderlineAt + 1, lastUnderlineAt + 5);
+
+        int prevUnderlineAt = fileName.lastIndexOf("_", lastUnderlineAt - 1);
+
+        String month = fileName.substring(prevUnderlineAt + 1, lastUnderlineAt);
+
+        int monthNumber = Month.valueOf(month.toUpperCase()).getValue();
+
+        if (monthNumber < 10)
+        {
+            month = "0" + monthNumber;
+        }
+        else
+        {
+            month = String.valueOf(monthNumber);
+        }
+
+        return new MonthYear(year + month);
+
+    }
+
+    /**
+     * return a list of the files with a *Monthly_Status* name in the
+     * @return
+     */
+    public List<FileNameDto> getInvoiceFileList()
+    {
+        List<FileNameDto> fileNames = new ArrayList<FileNameDto>();
+
+        Properties props = SystemManager.loadProperties();
+
+        String fileFolder = props.getProperty(SystemConstants.FILE_DIRECTORY);
+        String statusFilePattern = props.getProperty(SystemConstants.INVOICE_FILE_NAME_PATTERN);
+
+        File folder = new File(fileFolder);
+        File[] listOfFiles = folder.listFiles();
+
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                //see if the file matches the pattern for invoices
                 if (file.getName().startsWith(statusFilePattern))
                 {
                     FileNameDto fileNameDto = new FileNameDto();

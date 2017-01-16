@@ -41,7 +41,7 @@ public class ReportUIHelper {
             //determine which day of the week the current entry is for
             int dayOfWeek = DateTimeUtils.getDayOfWeek(entry.getLogDate());
 
-            dto.getHoursPerDay()[dayOfWeek- 2] = NumberUtils.roundHours(entry.getHours());
+            dto.getHoursPerDay()[dayOfWeek- 2] = NumberUtils.roundHoursFourDecimals(entry.getHours());
         }
 
         ArrayList tmp = new ArrayList<InnotasRowUiDto>(matrix.values());

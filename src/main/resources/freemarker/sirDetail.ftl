@@ -143,6 +143,29 @@
                         </div>
 
                         <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                Hours By Activity
+                            </div>
+                            <div class="panel-body">
+                                <div class="well well-sm">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>Activity</th>
+                                            <th style="text-align: right">Hours</th>
+                                        </tr>
+                                        <#if hoursByActivityList??>
+                                            <#list hoursByActivityList as row>
+                                                <tr>
+                                                    <td>${row.activityDesc}</td>
+                                                    <td style="text-align: right">${row.hours!0.0}</td>
+                                                </tr>
+                                            </#list>
+                                        </#if>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-primary">
                           <div class="panel-heading">
                                Logs
                           </div>

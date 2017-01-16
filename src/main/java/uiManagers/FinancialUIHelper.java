@@ -270,29 +270,36 @@ public class FinancialUIHelper {
 
         retDto.setCurrentYear(parmYear);
 
-        //summarize the revenue for the year
+        //Definitions:
+        //billed = all amounts BILLED in the year of interest
+        //received - all amounts RECEIVED in the year of interest
+        //due - for any invoice that was BILLED in the year of interest, but hasn't been received yet
+
         for (InvoiceDto dto : invoiceDtos) {
-            if (dto.getMonthYear().getYear() == year)
-            {
+
+            if (DateTimeUtils.getYearFromDate(dto.getInvoiceDate()) == year) {
                 retDto.setBilledHours(retDto.getBilledHours() + dto.getHours());
                 retDto.setBilledGross(retDto.getBilledGross() + dto.getTotalGross());
 
-                if (!dto.getReceivedDate().equals(DateTimeUtils.getNullDate()))
-                {
-                    retDto.setReceivedHours(retDto.getReceivedHours() + dto.getHours());
-                    retDto.setReceivedGross(retDto.getReceivedGross() + dto.getTotalGross());
-                }
-                else
+                if (dto.getReceivedDate().equals(DateTimeUtils.getNullDate()))
                 {
                     retDto.setDueHours(retDto.getDueHours() + dto.getHours());
                     retDto.setDueGross(retDto.getDueGross() + dto.getTotalGross());
                 }
             }
 
-            //update the overall gross for the year
+            if  (DateTimeUtils.getYearFromDate(dto.getReceivedDate()) == year)
+            {
+                retDto.setReceivedHours(retDto.getReceivedHours() + dto.getHours());
+                retDto.setReceivedGross(retDto.getReceivedGross() + dto.getTotalGross());
+            }
+
+
+            //update the overall gross for the year based on received date
             FinancialSummaryByYearUIDto yearDto = null;
             for (int x = 0; x < retDto.getSummaryByYear().size(); x++) {
-                if (retDto.getSummaryByYear().get(x).getYear().equals( String.valueOf(dto.getMonthYear().getYear()))) {
+                if (retDto.getSummaryByYear().get(x).getYear().equals(
+                        String.valueOf(DateTimeUtils.getYearFromDate(dto.getReceivedDate())))) {
                     yearDto = retDto.getSummaryByYear().get(x);
                     break;
                 }
@@ -300,9 +307,10 @@ public class FinancialUIHelper {
             if (yearDto == null)
             {
                 yearDto = new FinancialSummaryByYearUIDto();
-                yearDto.setYear( String.valueOf(dto.getMonthYear().getYear()));
+                yearDto.setYear( String.valueOf(DateTimeUtils.getYearFromDate(dto.getReceivedDate())));
                 retDto.getSummaryByYear().add(yearDto);
             }
+
             yearDto.setGrossIncome(yearDto.getGrossIncome() +
                                     dto.getTotalGross());
             yearDto.setGrossHours(yearDto.getGrossHours() + dto.getHours());
@@ -382,11 +390,11 @@ public class FinancialUIHelper {
         }
 
         //round the totals to 2 digits
-        retDto.setBilledHours(NumberUtils.roundHours(retDto.getBilledHours() ));
+        retDto.setBilledHours(NumberUtils.roundHoursFourDecimals(retDto.getBilledHours() ));
         retDto.setBilledGross(NumberUtils.roundDollars(retDto.getBilledGross()));
-        retDto.setReceivedHours(NumberUtils.roundHours(retDto.getReceivedHours()));
+        retDto.setReceivedHours(NumberUtils.roundHoursFourDecimals(retDto.getReceivedHours()));
         retDto.setReceivedGross(NumberUtils.roundDollars(retDto.getReceivedGross()));
-        retDto.setDueHours(NumberUtils.roundHours(retDto.getDueHours()));
+        retDto.setDueHours(NumberUtils.roundHoursFourDecimals(retDto.getDueHours()));
         retDto.setDueGross(NumberUtils.roundDollars(retDto.getDueGross()));
 
         for (DeductionUiDto dto : retList)
@@ -399,7 +407,7 @@ public class FinancialUIHelper {
         //round the yearly totals and then sort by year
         for (FinancialSummaryByYearUIDto dto : retDto.getSummaryByYear())
         {
-            dto.setGrossHours(NumberUtils.roundHours(dto.getGrossHours()));
+            dto.setGrossHours(NumberUtils.roundHoursFourDecimals(dto.getGrossHours()));
             dto.setGrossDeductions(NumberUtils.roundDollars(dto.getGrossDeductions()));
             dto.setGrossIncome(NumberUtils.roundDollars(dto.getGrossIncome()));
             dto.setNetIncome(dto.getGrossIncome() - dto.getGrossDeductions());
@@ -420,6 +428,13 @@ public class FinancialUIHelper {
             {
                 years.put(allInvoice.getMonthYear().getYearName(), allInvoice.getMonthYear().getYearName());
             }
+        }
+
+        //include the current year if we haven't invoiced yet for the year
+        MonthYear currentYear = DateTimeUtils.getCurrentMonthYear();
+        if (!years.containsKey(currentYear.getYearName()))
+        {
+            years.put(currentYear.getYearName(), currentYear.getYearName());
         }
 
         for (String year : years.keySet())

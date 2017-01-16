@@ -8,6 +8,7 @@ import daos.PurchaseOrderDao;
 import dtos.*;
 import org.bson.types.ObjectId;
 import utilities.DateTimeUtils;
+import utilities.NumberUtils;
 import utilities.SortUtils;
 
 import java.util.ArrayList;
@@ -30,25 +31,33 @@ public class FinancialManager {
         logDao = new LogDao(reliantDb);
     }
 
-
-    public InvoiceDto getNextInvoice(MonthYear monthYear)
+    /**
+     * this method will create an invoice based on the month/year following the last
+     * persisted invoice.
+     *
+     * @return - invoice data for the next month/year to bill
+     */
+    public InvoiceDto getNextInvoice()
     {
+        List<InvoiceDto> allInvoiceDtos = this.getAllInvoices();
+        InvoiceDto lastInvoiceDto  = allInvoiceDtos.get(0);
+        MonthYear nextMonthYear = lastInvoiceDto.getMonthYear().getNextMonth();
         InvoiceDto nextInvoice = new InvoiceDto();
         PurchaseOrderDto purchaseOrderDto =
-                this.purchaseOrderDao.getPurchaseOrderByMonthYear(monthYear);
+                this.purchaseOrderDao.getPurchaseOrderByMonthYear(nextMonthYear);
 
-        nextInvoice.setMonthYear(monthYear);
+        nextInvoice.setMonthYear(nextMonthYear);
         nextInvoice.setPoNumber(purchaseOrderDto.getPoNumber());
-        nextInvoice.setInvoiceNumber("RSLLC-" + monthYear.getMonthYear());
+        nextInvoice.setInvoiceNumber("RSLLC-" + nextMonthYear.getMonthYear());
 
-        List<CalendarDto> data = logDao.getCalendarHoursByMonth(monthYear);
+        List<CalendarDto> data = logDao.getCalendarHoursByMonth(nextMonthYear);
         double totHours = 0.0;
         for (CalendarDto dto : data)
         {
             totHours += dto.getHours();
         }
-        nextInvoice.setHours(totHours);
-        nextInvoice.setTotalGross(totHours * purchaseOrderDto.getHourlyRate());
+        nextInvoice.setHours(NumberUtils.roundHoursTwoDecimals(totHours));
+        nextInvoice.setTotalGross(NumberUtils.roundDollars(totHours * (purchaseOrderDto.getHourlyRate() - purchaseOrderDto.getPassthruRate())));
         nextInvoice.setInvoiceDate(DateTimeUtils.getSystemDate());
 
         return nextInvoice;

@@ -8,7 +8,7 @@
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
          <script src="\js\dayScripts.js"></script>
          <link rel="stylesheet" type="text/css" href="\css\calendar.css">
-        <title>New SIR</title>
+        <title>Daily Entry</title>
     </head>
 
 <style>
@@ -70,8 +70,12 @@
                             </button>
                         </div>
                         <div class="form-group">
-                            <input  class="form-control"
-                                    id="dailyEntryDate" value="${currentDay}" maxlength="10" size="10"></input>
+                            <#assign dt = currentDay[0..3] + "-" + currentDay[4..5] + "-" + currentDay[6..7]>
+
+                                <input class="form-control"
+                                       type="date" id="dailyEntryDate" name="dailyEntryDate"
+                                       value="${dt}"/>
+
                         </div>
                         <div class="form-group">
                             <button type="button" class="btn btn-default btn-sm" id="currDay"
