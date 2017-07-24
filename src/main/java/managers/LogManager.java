@@ -5,6 +5,7 @@ import common.LOVEnum;
 import common.MonthYear;
 import daos.LogDao;
 import dtos.CalendarDto;
+import dtos.SirLogDto;
 import org.bson.types.ObjectId;
 import utilities.DateTimeUtils;
 import utilities.NumberUtils;
@@ -78,5 +79,9 @@ public class LogManager {
         return this.logDao.updateLovValue(lovEnum, oldValue, newValue);
     }
 
-
+    public List<SirLogDto> getLogsByActivityTypeAndDate(String activityDesc,
+                                                        String fromDate, String toDate)
+    {
+        return this.logDao.getLogsByActivityTypeAndDate(activityDesc, fromDate, toDate);
+    }
 }

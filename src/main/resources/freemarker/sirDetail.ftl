@@ -6,6 +6,9 @@
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.15/b-1.3.1/datatables.min.css"/>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.15/datatables.min.js"></script>
+
         <title>SIR Detail</title>
     </head>
 
@@ -33,6 +36,17 @@
 
              window.location.href = '/dayEntry/' + returnDate;
         }
+
+        $(document).ready(function(){
+
+             $('#tblLogList').DataTable(
+             {
+                  "searching": true,
+                  "order": [[ 0, "desc" ]]
+              });
+        });
+
+
 
     </script>
     <body>
@@ -172,7 +186,7 @@
                           <div class="panel-body">
                             <div class="well well-sm">
                                 Total Hours:&nbsp;${totHours}
-                                <table class="table table-bordered">
+                                <table id="tblLogList" class="table table-bordered">
                                     <thead>
                                        <tr>
                                          <th>Date</th>

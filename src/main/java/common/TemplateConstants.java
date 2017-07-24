@@ -17,5 +17,8 @@ public class TemplateConstants {
     public static final String REVENUE = "receipts.ftl";
     public static final String FINANCIAL_SUMMARY = "financialSummary.ftl";
     public static final String PURCHASE_ORDERS = "purchaseOrders.ftl";
+    public static final String ACTIVITY_SUMMARY = "activitySummary.ftl";
+    public static final String ACTIVITY_LIST = "activityList.ftl";
+
 
 }

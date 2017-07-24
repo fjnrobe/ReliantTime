@@ -140,7 +140,7 @@ function deleteRevenueEntry(deductionEntry)
         var selectedValue = $(deductionEntry).attr("id");
             var values = selectedValue.split('&');
 
-       $("#delId").val(revenueListArray[values[1]].idAsString);
+    $("#delId").val(revenueListArray[values[1]].idAsString);
 
     $("#confirmDeleteLabel").html("Are you sure you want to delete this entry?");
 

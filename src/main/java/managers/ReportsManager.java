@@ -16,9 +16,11 @@ import utilities.SortUtils;
 
 import java.io.*;
 
+import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.util.*;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Robertson_Laptop on 9/7/2016.
@@ -31,6 +33,7 @@ public class ReportsManager {
     private final InvoiceDao invoiceDao;
     private final PurchaseOrderDao purchaseOrderDao;
     private LogManager logManager;
+    final static Logger logger = Logger.getLogger(ReportsManager.class);
 
     public ReportsManager(MongoDatabase reliantDb) {
 
@@ -45,6 +48,16 @@ public class ReportsManager {
     public void setLogManager(LogManager logManager)
     {
         this.logManager = logManager;
+    }
+
+    public List<ActivitySummaryDto> getActivitySummaryBySubprocess(String fromDate, String toDate)
+    {
+        return  this.reportsDao.getActivitySummaryBySubprocess(fromDate, toDate);
+    }
+
+    public List<ActivitySummaryDto> getActivitySummaryByActivity(String fromDate, String toDate)
+    {
+        return  this.reportsDao.getActivitySummaryByActivity(fromDate, toDate);
     }
 
     public List<SirHoursSummaryDto> getSirHoursByActivity(SirHoursSummarySearchDto searchDto)
@@ -826,23 +839,25 @@ public class ReportsManager {
 
                         firstRow = false;
                         int daysFromLastMonth = timesheetDto.getDayOfWeek() - 1;  //ex. if the first day of the month is on a thursday - this would return (4) - meaning we need 3 blank days (Sun, Mon, Tues, Wed)
-                        for (int dayIdx = 1; dayIdx <= daysFromLastMonth; dayIdx++) {
+                        if (daysFromLastMonth > 0) {
+                            for (int dayIdx = 1; dayIdx <= daysFromLastMonth; dayIdx++) {
 
-                            //day of week
-                            colIdx = dayIdx;
-                            cell1 = row1.createCell(dayIdx);
-                            cell1.setCellStyle(headerCell);
+                                //day of week
+                                colIdx = dayIdx;
+                                cell1 = row1.createCell(dayIdx);
+                                cell1.setCellStyle(headerCell);
 
-                            cell1.setCellValue(daysOfWeek[dayIdx - 1]);
+                                cell1.setCellValue(daysOfWeek[dayIdx - 1]);
 
-                            cell2 = row2.createCell(dayIdx);
-                            cell2.setCellStyle(borderCell);
-                            cell3 = row3.createCell(dayIdx);
-                            cell3.setCellStyle(borderCell);
-                            cell4 = row4.createCell(dayIdx);
-                            cell4.setCellStyle(borderCell);
+                                cell2 = row2.createCell(dayIdx);
+                                cell2.setCellStyle(borderCell);
+                                cell3 = row3.createCell(dayIdx);
+                                cell3.setCellStyle(borderCell);
+                                cell4 = row4.createCell(dayIdx);
+                                cell4.setCellStyle(borderCell);
+                            }
+                            colIdx++;
                         }
-                        colIdx++;
                     }
 
                 }
@@ -1567,16 +1582,22 @@ public class ReportsManager {
         Properties props = SystemManager.loadProperties();
 
         String fileFolder = props.getProperty(SystemConstants.FILE_DIRECTORY);
+
         String statusFilePattern = props.getProperty(SystemConstants.STATUS_FILE_NAME_PATTERN);
 
         File folder = new File(fileFolder);
+
         File[] listOfFiles = folder.listFiles();
 
+
         for (File file : listOfFiles) {
+
             if (file.isFile()) {
+
                 //see if the file matches the pattern for status reports
                 if (file.getName().startsWith(statusFilePattern))
                 {
+
                     FileNameDto fileNameDto = new FileNameDto();
                     fileNameDto.setFileName(file.getName());
                     fileNameDto.setFileNameWithPath(file.getPath());
@@ -1585,6 +1606,7 @@ public class ReportsManager {
                 }
             }
         }
+
 
         SortUtils.sortFileNames(fileNames, false);
 
@@ -1595,27 +1617,40 @@ public class ReportsManager {
     {
         //the file pattern is:
         //Monthly_Status_JRobertson_{month}_{year}.xls
-
         int lastUnderlineAt = fileName.lastIndexOf("_");
 
         String year = fileName.substring(lastUnderlineAt + 1, lastUnderlineAt + 5);
 
         int prevUnderlineAt = fileName.lastIndexOf("_", lastUnderlineAt - 1);
 
-        String month = fileName.substring(prevUnderlineAt + 1, lastUnderlineAt);
+        String monthName = fileName.substring(prevUnderlineAt + 1, lastUnderlineAt);
 
-        int monthNumber = Month.valueOf(month.toUpperCase()).getValue();
+        int month = 0;
+        try {
+            Date date = new SimpleDateFormat("MMM", Locale.ENGLISH).parse(monthName);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            month = cal.get(Calendar.MONTH);
 
-        if (monthNumber < 10)
+          //  int monthNumber = Month.valueOf(month.toUpperCase()).getValue();
+        } catch (Exception e)
         {
-            month = "0" + monthNumber;
+            logger.error("error mapping " + monthName + " to integer", e);
+
+        }
+
+        String monthNbr = "";
+
+        if (month < 10)
+        {
+            monthNbr = "0" +String.valueOf( month);
         }
         else
         {
-            month = String.valueOf(monthNumber);
+            monthNbr = String.valueOf(month);
         }
 
-        return new MonthYear(year + month);
+        return new MonthYear(year + monthNbr);
 
     }
 

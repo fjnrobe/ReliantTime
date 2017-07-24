@@ -267,4 +267,56 @@ public class LogDao extends BaseDao{
         return mapDto;
 
     }
+
+    public List<SirLogDto> getLogsByActivityTypeAndDate(String activityDesc,
+                                                        String fromDate, String toDate)
+    {
+//        Select *
+//            from log l
+//            inner join sirPcr s
+//             on l.sirPcrId = s._id
+//            where l.activityDesc = "xx"
+//              and l.logDate between '20160101' and '20160630'
+
+//        db.log.aggregate([
+//                {$match: {$and: [ {activityDesc: "Coding"},
+//        {logDate: {$gte: '20160101', $lte: '20160630'}}
+//        ]
+//    }
+//        },
+//        {$lookup: {from: "sirPcr", localField: "sirPcrId", foreignField: "_id", as:"sirPcr"}
+//        },
+//          {$unwind: "$sirPcr"}
+//        ]
+//        );
+
+        List<SirLogDto> dtos = new ArrayList<SirLogDto>();
+
+        Bson matchString = Aggregates.match(Filters.and(Filters.gte("logDate", fromDate),
+                Filters.lte("logDate", toDate), Filters.eq("activityDesc", activityDesc)));
+
+        Bson lookupString = Aggregates.lookup( "sirPcr", "sirPcrId", "_id", "sirPcr");
+
+        Bson unwind = Aggregates.unwind("$sirPcr");
+
+        MongoCursor iterable =
+                this.getCollection().aggregate(asList(matchString, lookupString, unwind
+                       )).iterator();
+
+        SirPcrMapper sirPcrMapper = new SirPcrMapper();
+
+        while (iterable.hasNext())
+        {
+            Document doc = (Document) iterable.next();
+
+            SirLogDto dto = new SirLogDto();
+
+            dto.setLogDto((LogDto) super.getMapper().mapFromDocument(doc));
+
+            dto.setSirPcrDto((SirPcrDto) sirPcrMapper.mapFromDocument((Document) doc.get("sirPcr")));
+            dtos.add(dto);
+        }
+
+        return dtos;
+    }
 }

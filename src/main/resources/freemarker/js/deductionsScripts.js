@@ -110,4 +110,10 @@ $(document).ready(function(){
         loadDeductionTypesForEditCategory($("#deductionCategoryCode").val());
     });
 
-});
+    $('#tblDeductionList').DataTable(
+         {
+              "searching": false,
+              "order": [[ 2, "desc" ]]
+          });
+    });
+

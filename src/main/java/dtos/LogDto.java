@@ -10,8 +10,6 @@ import java.util.Date;
 public class LogDto extends BaseDto{
 
     private ObjectId sirPcrId;
-
-
     private String legacySirId;
     private boolean billableInd;
     private String logDate;

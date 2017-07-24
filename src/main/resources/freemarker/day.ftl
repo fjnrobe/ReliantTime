@@ -260,7 +260,7 @@
 
                     <div id="deleteSir">
                         <p>Do you want to delete the SIR in addition to the log?</p>
-                        <button type="button" class="btn btn-primary" onClick='deleteSir($("#sirIdToDelete").val())'>Yes</button>
+                        <button type="button" class="btn btn-primary" ng='deleteSir($("#sirIdToDelete").val())'>Yes</button>
                         <button type="button" class="btn btn-default" onClick='deleteLog($("#logIdToDelete").val())'>No - Just The Log</button>
                     </div>
                     <div id="deleteLog">

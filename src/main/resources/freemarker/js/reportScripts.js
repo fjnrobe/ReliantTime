@@ -49,3 +49,18 @@ function openEmailPopup(emailEntry)
 
    $("#emailEntryModal").modal("show");
 }
+
+$(document).ready( function () {
+    $('#tblSubprocessActivity').DataTable(
+     {
+          "searching": false,
+          "order": [[ 2, "desc" ]]
+      });
+    $('#tblActivity').DataTable(
+         {
+               "searching": false,
+              "order": [[ 1, "desc" ]]
+          });
+
+
+} );

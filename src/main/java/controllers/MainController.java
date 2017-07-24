@@ -16,7 +16,7 @@ import utilities.DateTimeUtils;
 import utilities.JSONUtils;
 import utilities.SortUtils;
 import utilities.UrlEncoder;
-
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -39,6 +39,7 @@ public class MainController {
     private final UserManager userManager;
     private final FinancialManager financialManager;
     private final EmailManager emailManager;
+    final static Logger logger = Logger.getLogger(MainController.class);
 
     public static void main (String[] args) throws IOException {
 
@@ -59,7 +60,7 @@ public class MainController {
         this.financialManager = new FinancialManager(reliantDb);
         this.emailManager = new EmailManager(reliantDb);
 
-        //inject other managers
+        //inject otheREPORT_MONTHLY_STATUSr managers
         this.lovManager.setLogManager(this.logManager);
         this.lovManager.setSirPcrManager(this.sirPcrManager);
 
@@ -234,6 +235,7 @@ public class MainController {
         });
 
         //invoked from the calendar page to get the days/hours in the incoming month/year
+        //REST
         get(new Route(URLConstants.CALENDAR_DATA) {
             @Override
             public Object handle(Request request, Response response) {
@@ -249,6 +251,7 @@ public class MainController {
 
         //invoked from the calendar page to get any initialization needed
         //1) gets a list of all months/years where data exists
+        //REST
         get (new Route(URLConstants.CALENDAR_INIT) {
             @Override
                 public Object handle(Request request, Response response) {
@@ -658,29 +661,145 @@ public class MainController {
 
         });
 
-        get (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS, TemplateConstants.MONTHLY_STATUS) {
+        get(new FreemarkerBasedRoute(URLConstants.REPORT_ACTIVITY_SUMMARY, TemplateConstants.ACTIVITY_SUMMARY) {
+            @Override
+            protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
+
+                HashMap<String, Object> root = new HashMap<String, Object>();
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Entering: " + URLConstants.REPORT_ACTIVITY_SUMMARY);
+                }
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Leaving: " + URLConstants.REPORT_ACTIVITY_SUMMARY);
+                }
+
+                template.process(root, writer);
+            }
+        });
+
+        get (new FreemarkerBasedRoute(URLConstants.REPORT_ACTIVITY_LIST, TemplateConstants.ACTIVITY_LIST) {
             @Override
             public void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException{
 
                 HashMap<String, Object> root = new HashMap<String, Object>();
-                List<MonthYear> aList = reportManager.getAllMonthsWithLoggedPeriods(true);
-                root.put("monthYears", aList);
 
-                List<FileNameDto> fileList = reportManager.getStatusFileList();
-                root.put("fileList", fileList);
+                String activityDesc = request.params(":activityDesc");
+                activityDesc = activityDesc.replace("%20", " ");
+                String sDate = request.params(":fromDate");
+                String eDate = request.params(":toDate");
 
-                root.put("toAddresses", emailManager.getToEmailAddresses());
+
+                List<SirLogDto> dtos = logManager.getLogsByActivityTypeAndDate(activityDesc,
+                        sDate, eDate);
+
+                //tally up total hours
+                double totHours = 0.0;
+                for (SirLogDto dto : dtos)
+                {
+                    totHours += dto.getLogDto().getHours();
+                }
+
+                root.put("activityDesc", activityDesc);
+                root.put("fromDate", sDate);
+                root.put("toDate", eDate);
+                root.put("logList", dtos);
+                root.put("totHours", totHours);
+
 
                 template.process(root, writer);
             }
 
         });
 
-        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS, TemplateConstants.MONTHLY_STATUS) {
+        get (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS, TemplateConstants.MONTHLY_STATUS) {
             @Override
             public void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException{
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Entering: " + URLConstants.REPORT_MONTHLY_STATUS);
+                }
+
+                HashMap<String, Object> root = new HashMap<String, Object>();
+                List<MonthYear> aList = reportManager.getAllMonthsWithLoggedPeriods(true);
+                root.put("monthYears", aList);
+
+
+
+                try {
+                    List<FileNameDto> fileList = reportManager.getStatusFileList();
+                    root.put("fileList", fileList);
+                } catch (Exception e)
+                {
+                    logger.error("Error in call to reportManager.getStatusFileList()", e);
+                }
+
+                try {
+                    root.put("toAddresses", emailManager.getToEmailAddresses());
+                } catch (Exception e)
+                {
+                    logger.error("Error in call to emailManager.getToEmailAddresses() ",e);
+                }
+
+                template.process(root, writer);
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Leaving: " + URLConstants.REPORT_MONTHLY_STATUS);
+                }
+            }
+
+        });
+
+        post (new FreemarkerBasedRoute(URLConstants.REPORT_ACTIVITY_SUMMARY, TemplateConstants.ACTIVITY_SUMMARY) {
+
+            @Override
+            public void doHandle(Request request, Response response, Writer writer)
+                    throws IOException, TemplateException {
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Entering: " + URLConstants.REPORT_ACTIVITY_SUMMARY);
+                }
+
+                HashMap<String, Object> root = new HashMap<String, Object>();
+
+                String startDate = request.queryParams("fromDate");
+                String endDate = request.queryParams("toDate");
+
+                String sDate = DateTimeUtils.reformatDate(startDate, DateTimeUtils.DateFormats.YYYYMMDD, "-",
+                        DateTimeUtils.DateFormats.YYYYMMDD,"");
+
+                String eDate = DateTimeUtils.reformatDate(endDate, DateTimeUtils.DateFormats.YYYYMMDD, "-",
+                        DateTimeUtils.DateFormats.YYYYMMDD,"");
+
+                root.put("summarySubProcessActivityList",
+                        reportManager.getActivitySummaryBySubprocess(sDate, eDate));
+
+                root.put("summaryActivityList", reportManager.getActivitySummaryByActivity(sDate, eDate));
+                root.put("startDate", startDate);
+                root.put("endDate", endDate);
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Leaving: " + URLConstants.REPORT_ACTIVITY_SUMMARY);
+                }
+
+                template.process(root, writer);
+
+            }
+        });
+
+        post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS, TemplateConstants.MONTHLY_STATUS) {
+        @Override
+        public void doHandle(Request request, Response response, Writer writer)
+                throws IOException, TemplateException{
 
                 MonthYear yearMonth = new MonthYear(request.queryParams("monthYears"));
 
@@ -699,6 +818,7 @@ public class MainController {
             }
 
         });
+
 
         post (new FreemarkerBasedRoute(URLConstants.REPORT_MONTHLY_STATUS_EMAILFILE,
                 TemplateConstants.MONTHLY_STATUS) {

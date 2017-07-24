@@ -30,6 +30,7 @@
                         <li class="dropdown-header">Status</li>
                         <li><a href="/reports/innotas/">Weekly Innotas</a></li>
                         <li><a href="/reports/monthlyStatus">Monthly Status</a></li>
+                        <li><a href="/reports/activitySummary">Activity Summary</a></li>
                     </ul>
                 </li>
                 <li>

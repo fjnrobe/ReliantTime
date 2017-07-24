@@ -8,6 +8,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
    <script src="\js\deductionsScripts.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.15/b-1.3.1/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.15/datatables.min.js"></script>
+
 </head>
 <body>
 
@@ -93,7 +96,7 @@
                                             <span class="glyphicon glyphicon-plus">
                                            </span>
                   </button>
-                  <table class="table table-bordered" >
+                  <table id="tblDeductionList" class="table table-bordered" >
                     <thead>
                       <tr>
                         <th>Category</th>
@@ -101,9 +104,11 @@
                         <th>Post Date</th>
                         <th>Amount</th>
                         <th>Note</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                       </tr>
                     </thead>
-                    <tbody  id="tblDeductionList">
+                    <tbody>
                         <#if deductionList??>
                             <#list deductionList as row>
                                 <tr>
@@ -113,10 +118,10 @@
                                     <td style="text-align: right">${row.deductionDto.amount?string.currency}</td>
                                     <td>${row.deductionDto.note!""}</td>
                                     <td><a id="lnkEdit&${row?index}" onclick="editDeductionEntry(this)">
-                                        <span class="glyphicon glyphicon-pencil"></span>
+                                        <span class="glyphicon glyphicon-pencil"></span></a>
                                     </td>
                                     <td><a id="lnkDelete&${row?index}" onclick="deleteDeductionEntry(this)">
-                                        <span class="glyphicon glyphicon-remove-sign"></span>
+                                        <span class="glyphicon glyphicon-remove-sign"></span></a>
                                     </td>
                                 </tr>
                             </#list>

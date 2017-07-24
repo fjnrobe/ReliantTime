@@ -9,6 +9,9 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
    <script src="\js\sirListScripts.js"></script>
   <link rel="stylesheet" type="text/css" href="\css\calendar.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.15/b-1.3.1/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.15/datatables.min.js"></script>
+
 </head>
 <body>
 
@@ -61,7 +64,7 @@
                 </div>
 
                 <div class="well well-sm">
-                  <table class="table table-bordered">
+                  <table  id="tblsirList" class="table table-bordered">
                     <thead>
                       <tr>
                         <th>Close ?</th>
@@ -72,7 +75,7 @@
                         <th>Closed ?</th>
                       </tr>
                     </thead>
-                    <tbody id="tblsirList">
+                    <tbody >
 
                         <#if sirList??>
                             <div class="form-group">

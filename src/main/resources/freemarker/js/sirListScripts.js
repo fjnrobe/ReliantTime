@@ -15,4 +15,11 @@ $(document).ready(function(){
 	    submitPage("CLOSE");
 	});
 
+        $('#tblsirList').DataTable(
+         {
+               "searching": false,
+              "order": [[ 2, "desc" ]]
+          });
+
+
 });
