@@ -204,6 +204,45 @@ public class LogDao extends BaseDao{
 
     }
 
+    //the incoming value will be a date (YYYYMMDD) that represents the 1st day of the
+    //7 day week. The results will be a summary of log hours by innotas (primavera)
+    //description and log date
+    public List<LogDto> getInnotasHoursBySir(String startDate)
+    {
+        List<LogDto> entries = new ArrayList<LogDto>();
+        String startOfWeek = DateTimeUtils.getFirstDayOfWeek(startDate);
+        String endDate = DateTimeUtils.getLastDayOfWeek(startOfWeek);
+
+        Bson matchString = Aggregates.match(Filters.and(Filters.gte("logDate", startOfWeek),
+                Filters.lte("logDate", endDate)));
+        Bson project = Projections.fields(new Document("sirPcrId",1),
+                new Document("logDate",1),
+                new Document("hours",1));
+        Bson groupBy = Aggregates.group(new Document("sirPcrKey","$sirPcrId").append("day","$logDate"),
+                Accumulators.sum("TotalHours", "$hours"));
+        Bson sortBy = Aggregates.sort(new Document("_id",1));
+        MongoCursor iterable =
+                this.getCollection().aggregate(asList(matchString, groupBy, sortBy)).iterator();
+
+
+        while (iterable.hasNext())
+        {
+            Document doc = (Document) iterable.next();
+
+            LogDto dateEntry = new LogDto();
+            Document t = (Document) doc.get ("_id");
+            dateEntry.setSirPcrId(t.getObjectId("sirPcrKey"));
+            //dateEntry.setPrimaveraDesc(t.getString("desc"));
+            dateEntry.setLogDate(t.getString("day"));
+            dateEntry.setHours(doc.getDouble("TotalHours"));
+
+            entries.add(dateEntry);
+        }
+
+        return entries;
+
+    }
+
     public Long getUsageCount(String columnName, String columnValue)
     {
         return super.getCount(columnName, columnValue);

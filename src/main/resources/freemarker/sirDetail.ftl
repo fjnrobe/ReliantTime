@@ -77,10 +77,10 @@
                         <input type="hidden" id="sirId" name="sirId" value="${sirId!""}" >
                         <input type="hidden" id="logId" name="logId" value="${logId!""}" >
                         <input type="hidden" id="logDate" name="logDate" value="${logDate!""}" >
-                        <input type="hidden" id="sirCreateDate" name="sirCreateDate" <#if sirCreateDate??>value="${sirCreateDate?datetime}"</#if>>
-                        <input type="hidden" id="sirUpdateDate" name="sirUpdateDate" <#if sirUpdateDate??>value="${sirUpdateDate?datetime}"</#if>>
-                        <input type="hidden" id="logCreateDate" name="logCreateDate" <#if logCreateDate??>value="${logCreateDate?datetime}"</#if>>
-                        <input type="hidden" id="logUpdateDate" name="logUpdateDate" <#if logUpdateDate??>value="${logUpdateDate?datetime}"</#if>>
+                        <input type="hidden" id="sirCreateDate" name="sirCreateDate" <#if sirCreateDate??>value="${sirCreateDate}"</#if>>
+                        <input type="hidden" id="sirUpdateDate" name="sirUpdateDate" <#if sirUpdateDate??>value="${sirUpdateDate}"</#if>>
+                        <input type="hidden" id="logCreateDate" name="logCreateDate" <#if logCreateDate??>value="${logCreateDate}"</#if>>
+                        <input type="hidden" id="logUpdateDate" name="logUpdateDate" <#if logUpdateDate??>value="${logUpdateDate}"</#if>>
                         <div class="well">
                           <div class="row">
                             <div class="col-md-6">

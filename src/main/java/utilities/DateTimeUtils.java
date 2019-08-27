@@ -6,17 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import common.LogTime;
 import common.MonthYear;
-import common.Year;
 
 
 import dtos.EffectiveInterval;
 import dtos.LogDto;
-import org.apache.commons.lang3.time.DateUtils;
-import org.bson.Document;
-import sun.util.resources.cldr.ak.CalendarData_ak_GH;
 
 public class DateTimeUtils {
 

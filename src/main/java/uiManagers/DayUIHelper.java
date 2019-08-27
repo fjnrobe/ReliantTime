@@ -65,7 +65,6 @@ public class DayUIHelper {
                 } else {
                     uiDto.getSpaceBeforeEntry().add(0);
                 }
-
                 //set the width of the button bsaed on the time in minutes / 15 minutes - each column on the grid will be 15 minutes'
                 uiDto.getEntryWidth().add(
                         DateTimeUtils.getMinutesBetweenTimeOnSameDay(logStartTime, logEndTime) / 15);

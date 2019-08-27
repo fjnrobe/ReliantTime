@@ -23,10 +23,11 @@ public class ReportUIHelper {
 
         for (LogDto entry : entries)
         {
-            if (!matrix.containsKey(entry.getPrimaveraDesc()))
+            if (!matrix.containsKey(entry.getSirPcrNumber() + " : " + entry.getSirNickName()))
             {
                 InnotasRowUiDto newRow = new InnotasRowUiDto();
-                newRow.setDescription(entry.getPrimaveraDesc());
+             //   newRow.setDescription(entry.getPrimaveraDesc());
+                newRow.setDescription(entry.getSirPcrNumber() + " : " + entry.getSirNickName());
                 newRow.setLogDate(entry.getLogDate());
                 for (int x = 0; x <= 6; x++)
                 {
@@ -34,13 +35,17 @@ public class ReportUIHelper {
 
                 }
 
-                matrix.put(entry.getPrimaveraDesc(), newRow);
+                matrix.put(entry.getSirPcrNumber() + " : " + entry.getSirNickName(), newRow);
             }
-            InnotasRowUiDto dto = matrix.get(entry.getPrimaveraDesc());
+            InnotasRowUiDto dto = matrix.get(entry.getSirPcrNumber() + " : " + entry.getSirNickName());
 
             //determine which day of the week the current entry is for
             int dayOfWeek = DateTimeUtils.getDayOfWeek(entry.getLogDate());
 
+            if (dayOfWeek < 2)
+            {
+                dayOfWeek = 8;
+            }
             dto.getHoursPerDay()[dayOfWeek- 2] = NumberUtils.roundHoursFourDecimals(entry.getHours());
         }
 

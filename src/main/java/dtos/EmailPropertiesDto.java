@@ -10,9 +10,11 @@ public class EmailPropertiesDto extends BaseDto {
     private String smtpHost;
     private String smtpPort;
     private String smtpAuth;
+    private String smtpUserName;
+
     private String sourceEmail;
     private String sourcePersonal;
-    private String sourcePassword;
+    private String smtpPassword;
     private ArrayList<String> toEmails;
 
     public String getSmtpHost() {
@@ -47,14 +49,6 @@ public class EmailPropertiesDto extends BaseDto {
         this.sourceEmail = sourceEmail;
     }
 
-    public String getSourcePassword() {
-        return sourcePassword;
-    }
-
-    public void setSourcePassword(String sourcePassword) {
-        this.sourcePassword = sourcePassword;
-    }
-
     public ArrayList<String> getToEmails() {
         return toEmails;
     }
@@ -69,5 +63,21 @@ public class EmailPropertiesDto extends BaseDto {
 
     public void setSourcePersonal(String sourcePersonal) {
         this.sourcePersonal = sourcePersonal;
+    }
+
+    public String getSmtpUserName() {
+        return smtpUserName;
+    }
+
+    public void setSmtpUserName(String smtpUserName) {
+        this.smtpUserName = smtpUserName;
+    }
+
+    public String getSmtpPassword() {
+        return smtpPassword;
+    }
+
+    public void setSmtpPassword(String smtpPassword) {
+        this.smtpPassword = smtpPassword;
     }
 }

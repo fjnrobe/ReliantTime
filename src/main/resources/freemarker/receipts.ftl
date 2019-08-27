@@ -22,7 +22,7 @@
             <div class="panel-heading">
                 Edit Invoices
             </div>
-            <table class="panel-body">
+            <div class="panel-body">
 
                 <div class="well">
                     <div class="form-group">
@@ -40,11 +40,15 @@
                               </#if>
                            </select>
                       </div>
+                      <div class="col-md-2">
+                        <input class="btn btn-default" id="btnInvoice" type="button" value="Add New"
+                        onclick="addRevenueEntry()">
 
-                      <input class="btn btn-default" id="btnInvoice" type="button" value="Add New"
-                      onclick="addRevenueEntry()">
-
-                      <a href="#summary">View Summary</a>
+                          <a href="#summary">View Summary</a>
+                      </div>
+                      <div class="col-md-6">
+                          <a id="lnkShowEmailHistory" onclick="showEmailHistory()">Email History</a>
+                      </div>
                     </div>
                   <table class="table table-bordered" >
                     <thead>
@@ -56,6 +60,7 @@
                         <th>Gross Revenue</th>
                         <th>Invoice Date</th>
                         <th>Received Date</th>
+                        <th colspan="4">Actions</th>
                       </tr>
                     </thead>
                     <tbody  id="tblRevenueList">
@@ -306,6 +311,39 @@
       </div>
     </div>
   </div>
+
+ <!-- Email History Modal -->
+ <div id="emailHistoryModal" class="modal" role="dialog">
+     <div class="modal-dialog modal-lg">
+
+         <!-- Modal content-->
+         <div class="modal-content">
+
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">&times;</button>
+                 <h4 class="modal-title">Email History</h4>
+             </div>
+             <div class="modal-body">
+                 <table class="table table-bordered" >
+                     <thead>
+                         <tr>
+                             <th>Send Date</th>
+                             <th>To</th>
+                             <th>From</th>
+                             <th>Subject</th>
+                             <th>Body</th>
+                         </tr>
+                     </thead>
+                     <tbody  id="tblEmailHistory">
+                    </tbody>
+                 </table>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+             </div>
+         </div>
+     </div>
+ </div>
 
 
 </body>

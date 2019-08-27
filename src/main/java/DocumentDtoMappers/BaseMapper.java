@@ -1,7 +1,6 @@
 package DocumentDtoMappers;
 
 import dtos.BaseDto;
-import dtos.LogDto;
 import org.bson.Document;
 
 /**

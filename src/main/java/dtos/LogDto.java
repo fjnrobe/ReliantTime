@@ -19,6 +19,25 @@ public class LogDto extends BaseDto{
     private String primaveraDesc;
     private String activityDesc;
     private double hours;
+    private String sirPcrNumber;
+
+    public String getSirPcrNumber() {
+        return sirPcrNumber;
+    }
+
+    public void setSirPcrNumber(String sirPcrNumber) {
+        this.sirPcrNumber = sirPcrNumber;
+    }
+
+    public String getSirNickName() {
+        return sirNickName;
+    }
+
+    public void setSirNickName(String sirNickName) {
+        this.sirNickName = sirNickName;
+    }
+
+    private String sirNickName;
 
     public String getLegacySirId() {
         return legacySirId;

@@ -48,6 +48,7 @@ public class URLConstants
         public static final String REPORT_ACTIVITY_LIST = "/reports/activityList/:activityDesc/:fromDate/:toDate";
 
         public static final String MAINT_SIR_LIST ="/sirList";
+
         public static final String DEDUCTIONS = "/deductions";
         public static final String DEDUCTIONS_UPDATE = "/deductions/update";
         //mapped
@@ -65,4 +66,6 @@ public class URLConstants
         public static final String FINANCIAL_SUMMARY_DATA = "/financialSummary/data/:year";
         public static final String PURCHASE_ORDERS = "/purchaseOrders";
         public static final String PURCHASE_ORDER_DATA = "/purchaseOrders/data/:poNumber";
+
+        public static final String EMAIL_HISTORY = "/emailHistory";
 }

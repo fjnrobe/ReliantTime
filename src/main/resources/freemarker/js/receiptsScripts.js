@@ -1,5 +1,6 @@
 var revenueListArray;
 
+
 function loadInvoices(year)
 {
    $.ajax({url: "/revenue/data/" + year, async: false, success: function(result){
@@ -145,6 +146,37 @@ function deleteRevenueEntry(deductionEntry)
     $("#confirmDeleteLabel").html("Are you sure you want to delete this entry?");
 
     $("#deleteEntryModal").modal("show");
+}
+
+function showEmailHistory()
+{
+   var emailList; //list of EmailMessageDto
+   $.ajax({url: "/emailHistory", async: false, success: function(result){
+                emailList = JSON.parse(result);
+                loadEmailHistoryTable(emailList);
+          }});
+}
+
+function loadEmailHistoryTable(emailList)
+{
+     $("#tblEmailHistory").empty();
+
+    for (i = 0; i < emailList.length; i++)
+     {
+        var newRow = $("<tr>").appendTo( $("#tblEmailHistory"));
+        var newCol = $("<td>").appendTo(newRow);
+        $("<p>" + dateAsMMDDYYYY(emailList[i].sendDate) + "</p>").appendTo(newCol);
+        newCol = $("<td>").appendTo(newRow);
+        $("<p>" + emailList[i].toEmail + "</p>").appendTo(newCol);
+        newCol = $("<td>").appendTo(newRow);
+        $("<p>" + emailList[i].fromEmail + "</p>").appendTo(newCol);
+        newCol = $("<td>").appendTo(newRow);
+        $("<p>" + emailList[i].subject + "</p>").appendTo(newCol);
+        newCol = $("<td>").appendTo(newRow);
+        $("<p>" + emailList[i].body + "</p>").appendTo(newCol);
+     }
+
+    $("#emailHistoryModal").modal("show");
 }
 
 $(document).ready(function(){

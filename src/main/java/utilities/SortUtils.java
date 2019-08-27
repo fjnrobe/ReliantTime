@@ -144,6 +144,13 @@ public class SortUtils {
         }
     }
 
+    private static class CreateDateComparator implements Comparator<BaseDto>
+    {
+        public int compare(BaseDto dto1, BaseDto dto2) {
+            return dto1.getCreateDate().compareTo(dto2.getCreateDate());
+        }
+    }
+
     private static class HoursCalendarComparator implements Comparator<TimesheetDto> {
 
         public int compare (TimesheetDto object1, TimesheetDto object2)
@@ -325,6 +332,19 @@ public class SortUtils {
         Collections.sort(reportRecords, comparator);
 
         return reportRecords;
+    }
+
+    public static List<BaseDto> sortByCreateDate(List<BaseDto> dtos, boolean ascending)
+    {
+        CreateDateComparator comparator = new CreateDateComparator();
+        Collections.sort(dtos, comparator);
+
+        if (!ascending)
+        {
+            Collections.reverse(dtos);
+        }
+
+        return dtos;
     }
 
 }

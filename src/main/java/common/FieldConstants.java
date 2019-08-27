@@ -97,7 +97,16 @@ public class FieldConstants {
     public static final String SMTP_HOST = "smtpHost";
     public static final String SOURCE_EMAIL = "sourceEmail";
     public static final String SOURCE_PERSONAL = "sourcePersonal";
-    public static final String SOURCE_PASSWORD = "sourcePassword";
+    public static final String SMTP_USERNAME = "smtpUserName";
+    public static final String SMTP_PASSWORD = "smtpPassword";
     public static final String TO_EMAILS = "toEmailAddresses";
+
+    //fields for the Email History
+    public static final String EMAIL_FROM = "emailFrom";
+    public static final String EMAIL_TO = "toEmail";
+    public static final String EMAIL_SUBJECT = "subject";
+    public static final String EMAIL_BODY = "body";
+    public static final String EMAIL_ATTACHMENT = "attachment";
+    public static final String EMAIL_SENDDATE = "sendDate";
 
 }

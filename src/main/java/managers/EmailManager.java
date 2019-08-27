@@ -3,8 +3,11 @@ package managers;
 import com.mongodb.client.MongoDatabase;
 import common.SystemConstants;
 import daos.DeductionDao;
+import daos.EmailHistoryDao;
 import daos.EmailPropertiesDao;
+import dtos.EmailMessageDto;
 import dtos.EmailPropertiesDto;
+import utilities.DateTimeUtils;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -25,10 +28,17 @@ import java.util.Properties;
 public class EmailManager {
 
     private final EmailPropertiesDao emailPropertiesDao;
+    private final EmailHistoryDao emailHistoryDao;
 
     public EmailManager(MongoDatabase reliantDb) {
 
         emailPropertiesDao = new EmailPropertiesDao(reliantDb);
+        emailHistoryDao = new EmailHistoryDao(reliantDb);
+    }
+
+    public List<EmailMessageDto> getEmailHistory()
+    {
+        return this.emailHistoryDao.getEmailHistory();
     }
 
     public List<String> getToEmailAddresses()
@@ -107,9 +117,44 @@ public class EmailManager {
             msg.setContent(multipart);
 
             // Send message
-            Transport.send(msg);
+            // Create a transport.
+            Transport transport = session.getTransport();
+
+            // Send the message.
+            try
+            {
+                System.out.println("Sending...");
+
+                // Connect to Amazon SES using the SMTP username and password you specified above.
+                transport.connect(propertiesDto.getSmtpHost(), propertiesDto.getSmtpUserName(), propertiesDto.getSmtpPassword());
+
+                // Send the email.
+                transport.sendMessage(msg, msg.getAllRecipients());
+                System.out.println("Email sent!");
+            }
+            catch (Exception ex) {
+                System.out.println("The email was not sent.");
+                System.out.println("Error message: " + ex.getMessage());
+            }
+            finally
+            {
+                // Close and terminate the connection.
+                transport.close();
+            }
+  //          Transport.send(msg);
 
             this.addReceipientEmail(toEmail);
+
+            //log the email transmission
+            EmailMessageDto mailDto = new EmailMessageDto();
+            mailDto.setToEmail(toEmail);
+            mailDto.setFromEmail(propertiesDto.getSourceEmail());
+            mailDto.setSubject(subjectText);
+            mailDto.setBody(bodyText);
+            mailDto.setSendDate(DateTimeUtils.getSystemDate());
+            mailDto.setAttachmentName(attachmentFileName);
+            this.emailHistoryDao.addEmailHistory(mailDto);
+
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -124,21 +169,25 @@ public class EmailManager {
     private Session initSession(final EmailPropertiesDto propertiesDto)
     {
         Properties props = new Properties();
-        props.put("mail.smtp.host", propertiesDto.getSmtpHost());
+        props.put("mail.transport.protocol", "smtp");
+       // props.put("mail.smtp.host", propertiesDto.getSmtpHost());
         props.put("mail.smtp.port", propertiesDto.getSmtpPort()); //TLS Port
-        props.put("mail.smtp.auth", "true"); //enable authentication
+        props.put("mail.smtp.auth", propertiesDto.getSmtpAuth()); //enable authentication
         props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
 
-        //create Authenticator object to pass in Session.getInstance argument
-        Authenticator auth = new Authenticator() {
-            //override the getPasswordAuthentication method
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(propertiesDto.getSourceEmail(),
-                                                    propertiesDto.getSourcePassword());
-            }
-        };
+        //props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
-        return Session.getInstance(props, auth);
+//        //create Authenticator object to pass in Session.getInstance argument
+//        Authenticator auth = new Authenticator() {
+//            //override the getPasswordAuthentication method
+//            protected PasswordAuthentication getPasswordAuthentication() {
+//                return new PasswordAuthentication(propertiesDto.getSourceEmail(),
+//                                                    propertiesDto.getSourcePassword());
+//            }
+//        };
+
+//        return Session.getInstance(props, auth);
+           return Session.getDefaultInstance(props);
     }
 
     private MimeMessage packageMessage(EmailPropertiesDto propertiesDto,
@@ -168,286 +217,5 @@ public class EmailManager {
         }
         return msg;
     }
-
-//    public void TLSAuthEmailSetup()
-//    {
-//        final String fromEmail = "fjnrobe@yahoo.com"; //requires valid gmail id
-//        final String password = "P1apple#"; // correct password for gmail id
-//        final String toEmail = "fjnrobe@yahoo.com"; // can be any email id
-//
-//        Properties props = new Properties();
-//        props.put("mail.smtp.host", "smtp.mail.yahoo.com"); //SMTP Host
-//        props.put("mail.smtp.port", "587"); //TLS Port
-//        props.put("mail.smtp.auth", "true"); //enable authentication
-//        props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
-//
-//        //create Authenticator object to pass in Session.getInstance argument
-//        Authenticator auth = new Authenticator() {
-//            //override the getPasswordAuthentication method
-//            protected PasswordAuthentication getPasswordAuthentication() {
-//                return new PasswordAuthentication(fromEmail, password);
-//            }
-//        };
-//        Session session = Session.getInstance(props, auth);
-//
-//     //   EmailManager.sendEmail(session, toEmail,"TLSEmail Testing Subject", "TLSEmail Testing Body");
-//
-//     //   EmailManager.sendAttachmentEmail(session, toEmail,"TLSEmail Testing Subject with Attachment", "SSLEmail Testing Body with Attachment");
-//
-//        EmailManager.sendImageEmail(session, toEmail,"SSLEmail Testing Subject with Image", "SSLEmail Testing Body with Image");
-//
-//
-//    }
-
-//    public static void SSLAuthEmailSetup()
-//    {
-//        /**
-//         Outgoing Mail (SMTP) Server
-//         requires TLS or SSL: smtp.gmail.com (use authentication)
-//         Use Authentication: Yes
-//         Port for SSL: 465
-//         */
-//
-//        final String fromEmail = "fjnrobe@yahoo.com"; //requires valid gmail id
-//        final String password = "P1apple#"; // correct password for gmail id
-//        final String toEmail = "fjnrobe@yahoo.com"; // can be any email id
-//
-//        Properties props = new Properties();
-//        props.put("mail.smtp.host", "smtp.mail.yahoo.com"); //SMTP Host
-//        props.put("mail.smtp.socketFactory.port", "465"); //SSL Port
-//        props.put("mail.smtp.socketFactory.class",
-//                "javax.net.ssl.SSLSocketFactory"); //SSL Factory Class
-//        props.put("mail.smtp.auth", "true"); //Enabling SMTP Authentication
-//        props.put("mail.smtp.port", "465"); //SMTP Port
-//
-//        Authenticator auth = new Authenticator() {
-//            //override the getPasswordAuthentication method
-//            protected PasswordAuthentication getPasswordAuthentication() {
-//                return new PasswordAuthentication(fromEmail, password);
-//            }
-//        };
-//
-//        Session session = Session.getDefaultInstance(props, auth);
-//        System.out.println("Session created");
-//        EmailManager.sendEmail(session, toEmail,"SSLEmail Testing Subject", "SSLEmail Testing Body");
-//
-//
-//
-//    }
-
-//    public static void noAuthEmailSetup()
-//    {
-//
-//        String smtpHostServer = "smtp.mail.yahoo.com";
-//        String emailID = "fjnrobe@yahoo.com";
-//
-//        Properties props = System.getProperties();
-//
-//        props.put("mail.smtp.host", smtpHostServer);
-//
-//        Session session = Session.getInstance(props, null);
-//
-//        EmailManager.sendEmail(session, emailID,"SimpleEmail Testing Subject", "SimpleEmail Testing Body");
-//    }
-
-    /**
-     * Utility method to send simple HTML email
-     * @param session
-     * @param toEmail
-     * @param subject
-     * @param body
-     */
-//    public static void sendEmail(Session session, String toEmail, String subject, String body){
-//        try
-//        {
-//            MimeMessage msg = new MimeMessage(session);
-//            //set message headers
-//            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-//            msg.addHeader("format", "flowed");
-//            msg.addHeader("Content-Transfer-Encoding", "8bit");
-//
-//            msg.setFrom(new InternetAddress("fjnrobe@yahoo.com", "fjnrobe"));
-//
-//            msg.setReplyTo(InternetAddress.parse("fjnrobe@yahoo.com", false));
-//
-//            msg.setSubject(subject, "UTF-8");
-//
-//            msg.setText(body, "UTF-8");
-//
-//            msg.setSentDate(new Date());
-//
-//            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-//
-//            Transport.send(msg);
-//
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public static void sendAttachmentEmail(Session session, String toEmail, String subject, String body){
-//
-//        try{
-//            MimeMessage msg = new MimeMessage(session);
-//            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-//            msg.addHeader("format", "flowed");
-//            msg.addHeader("Content-Transfer-Encoding", "8bit");
-//
-//            msg.setFrom(new InternetAddress("fjnrobe@yahoo.com", "fjnrobe"));
-//
-//            msg.setReplyTo(InternetAddress.parse("fjnrobe@yahoo.com", false));
-//
-//            msg.setSubject(subject, "UTF-8");
-//
-//            msg.setSentDate(new Date());
-//
-//            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-//
-//            // Create the message body part
-//            BodyPart messageBodyPart = new MimeBodyPart();
-//
-//            // Fill the message
-//            messageBodyPart.setText(body);
-//
-//            // Create a multipart message for attachment
-//            Multipart multipart = new MimeMultipart();
-//
-//            // Set text message part
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            // Second part is attachment
-//            messageBodyPart = new MimeBodyPart();
-//            String filename = "C:\\reliantData\\JRobertson_PO_66584_Timesheet_and_Invoice_Oct_2016.xlsx";
-//            DataSource source = new FileDataSource(filename);
-//            messageBodyPart.setDataHandler(new DataHandler(source));
-//            messageBodyPart.setFileName(filename);
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            // Send the complete message parts
-//            msg.setContent(multipart);
-//
-//            // Send message
-//            Transport.send(msg);
-//        }catch (MessagingException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//    }
-//
-//    public static void sendImageEmail(Session session, String toEmail, String subject, String body){
-//        try{
-//            MimeMessage msg = new MimeMessage(session);
-//            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-//            msg.addHeader("format", "flowed");
-//            msg.addHeader("Content-Transfer-Encoding", "8bit");
-//
-//            msg.setFrom(new InternetAddress("fjnrobe@yahoo.com", "fjnrobe"));
-//
-//            msg.setReplyTo(InternetAddress.parse("fjnrobe@yahoo.com", false));
-//
-//            msg.setSubject(subject, "UTF-8");
-//
-//            msg.setSentDate(new Date());
-//
-//            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-//
-//            // Create the message body part
-//            BodyPart messageBodyPart = new MimeBodyPart();
-//
-//            messageBodyPart.setText(body);
-//
-//            // Create a multipart message for attachment
-//            Multipart multipart = new MimeMultipart();
-//
-//            // Set text message part
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            // Second part is image attachment
-//            messageBodyPart = new MimeBodyPart();
-//            String filename = "c:\\reliantData\\IMG_4287.jpg";
-//            DataSource source = new FileDataSource(filename);
-//            messageBodyPart.setDataHandler(new DataHandler(source));
-//            messageBodyPart.setFileName(filename);
-//            //Trick is to add the content-id header here
-//            messageBodyPart.setHeader("Content-ID", "image_id");
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            //third part for displaying image in the email body
-//            messageBodyPart = new MimeBodyPart();
-//            messageBodyPart.setContent("<h1>Attached Image</h1>" +
-//                    "<img src='cid:image_id'>", "text/html");
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            //Set the multipart message to the email message
-//            msg.setContent(multipart);
-//
-//            // Send message
-//            Transport.send(msg);
-//        }catch (MessagingException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public static void sendImageEmail(Session session, String toEmail, String subject, String body){
-//        try{
-//            MimeMessage msg = new MimeMessage(session);
-//            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-//            msg.addHeader("format", "flowed");
-//            msg.addHeader("Content-Transfer-Encoding", "8bit");
-//
-//            msg.setFrom(new InternetAddress("fjnrobe@yahoo.com", "fjnrobe"));
-//
-//            msg.setReplyTo(InternetAddress.parse("fjnrobe@yahoo.com", false));
-//
-//            msg.setSubject(subject, "UTF-8");
-//
-//            msg.setSentDate(new Date());
-//
-//            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-//
-//            // Create the message body part
-//            BodyPart messageBodyPart = new MimeBodyPart();
-//
-//            messageBodyPart.setText(body);
-//
-//            // Create a multipart message for attachment
-//            Multipart multipart = new MimeMultipart();
-//
-//            // Set text message part
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            // Second part is image attachment
-//            messageBodyPart = new MimeBodyPart();
-//            String filename = "c:\\reliantData\\IMG_4287.jpg";
-//            DataSource source = new FileDataSource(filename);
-//            messageBodyPart.setDataHandler(new DataHandler(source));
-//            messageBodyPart.setFileName(filename);
-//            //Trick is to add the content-id header here
-//            messageBodyPart.setHeader("Content-ID", "image_id");
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            //third part for displaying image in the email body
-//            messageBodyPart = new MimeBodyPart();
-//            messageBodyPart.setContent("<h1>Attached Image</h1>" +
-//                    "<img src='cid:image_id'>", "text/html");
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            //Set the multipart message to the email message
-//            msg.setContent(multipart);
-//
-//            // Send message
-//            Transport.send(msg);
-//        }catch (MessagingException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
 }

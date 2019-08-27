@@ -14,5 +14,6 @@ public class CollectionConstants {
     public static final String USER = "user";
     public static final String PURCHASE_ORDER = "purchaseOrders";
     public static final String EMAIL_PROPERTIES = "emailProperties";
+    public static final String EMAIL_HISTORY = "emailHistory";
 
 }

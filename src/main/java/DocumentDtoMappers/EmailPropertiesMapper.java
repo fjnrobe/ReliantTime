@@ -23,7 +23,8 @@ public class EmailPropertiesMapper extends BaseMapper {
         dto.setSmtpHost(doc.getString(FieldConstants.SMTP_HOST));
         dto.setSmtpPort(doc.getString(FieldConstants.SMTP_PORT));
         dto.setSourceEmail(doc.getString(FieldConstants.SOURCE_EMAIL));
-        dto.setSourcePassword(doc.getString(FieldConstants.SOURCE_PASSWORD));
+        dto.setSmtpUserName(doc.getString(FieldConstants.SMTP_USERNAME));
+        dto.setSmtpPassword(doc.getString(FieldConstants.SMTP_PASSWORD));
         dto.setToEmails((ArrayList<String>) doc.get(FieldConstants.TO_EMAILS));
         dto.setSourcePersonal(doc.getString(FieldConstants.SOURCE_PERSONAL));
 
@@ -42,7 +43,8 @@ public class EmailPropertiesMapper extends BaseMapper {
         doc.put(FieldConstants.SMTP_PORT, documentDto.getSmtpPort());
         doc.put(FieldConstants.SMTP_HOST, documentDto.getSmtpHost());
         doc.put(FieldConstants.SOURCE_EMAIL, documentDto.getSourceEmail());
-        doc.put(FieldConstants.SOURCE_PASSWORD, documentDto.getSourcePassword());
+        doc.put(FieldConstants.SMTP_USERNAME, documentDto.getSmtpUserName());
+        doc.put(FieldConstants.SMTP_PASSWORD, documentDto.getSmtpPassword());
         doc.put(FieldConstants.TO_EMAILS, documentDto. getToEmails());
         doc.put(FieldConstants.SOURCE_PERSONAL, documentDto.getSourcePersonal());
 

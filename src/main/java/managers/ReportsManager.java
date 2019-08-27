@@ -75,7 +75,16 @@ public class ReportsManager {
 
     public List<LogDto> getInnotasHours(String startDate)
     {
-        return this.logDao.getInnotasHours(startDate);
+       // return this.logDao.getInnotasHours(startDate);
+        List<LogDto> logDtos = this.logDao.getInnotasHoursBySir(startDate);
+        for (LogDto logDto : logDtos)
+        {
+            SirPcrDto sirPcrDto = this.sirPcrDao.getSirById(logDto.getSirPcrId());
+            logDto.setSirPcrNumber(sirPcrDto.getSirPcrNumber());
+            logDto.setSirNickName(sirPcrDto.getNickName());
+        }
+
+        return logDtos;
     }
 
     public String writeInvoicePackage (String invoiceNumber)
